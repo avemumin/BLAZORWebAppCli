@@ -1,0 +1,60 @@
+﻿@page "/qualitypageandmachines"
+@inject IReportSerivce<QualityDetailReportAndMachineDTO> reportService
+
+<h3>Raport jakościowy w rozbiciu na urzadzenia</h3>
+
+@if (qualityListAm == null)
+{
+    <LoadingData DisplayMessage="false"></LoadingData>
+}
+else if (qualityListAm.Count == 0)
+{
+    <text> Brak danych do wyświetlenia </text>
+}
+else
+{
+    <GridView Items="qualityListAm">
+        <GridColumns>
+            <GridColumn ColumnTitle="Id.Urządzenia"></GridColumn>
+            <GridColumn AllowFiltering="true" ColumnTitle="Nr.Seryjny"></GridColumn>
+            <GridColumn ColumnTitle="Wrt. nominału"></GridColumn>
+            <GridColumn ColumnTitle="Łączna ilość nominału"></GridColumn>
+            <GridColumn ColumnTitle="Ilość z kryterium"></GridColumn>
+            <GridColumn ColumnTitle="Kryterium"></GridColumn>
+            <GridColumn ColumnTitle="Waluta"></GridColumn>
+            <GridColumn ColumnTitle="Tryb"></GridColumn>
+        </GridColumns>
+        <GridRow Context="quality">
+            <td><b>@quality.IdMachine</b> </td>
+            <td><b>@quality.SN</b> </td>
+            <td><b>@quality.FaceValue</b> </td>
+            <td><b>@quality.CountedCount.ToString("### ### ### ###")</b> </td>
+            <td><b>@quality.Count.ToString("### ### ### ###")</b> </td>
+            <td><b>@quality.QualityValue</b> </td>
+            <td><b>@quality.Symbol</b> </td>
+            <td><b>@quality.ModeValue</b> </td>
+        </GridRow>
+    </GridView>
+}
+
+@code {
+    public QualityDetailReportAndMachineDTO qualityam { get; set; }
+    public List<QualityDetailReportAndMachineDTO> qualityListAm { get; set; }
+
+    protected override void OnInitialized()
+    {
+        qualityam = new QualityDetailReportAndMachineDTO();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await LoadData();
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task LoadData()
+    {
+        qualityListAm = await reportService.GetAllAsync("qualitydetailandmachine/get");
+        StateHasChanged();
+    }
+}

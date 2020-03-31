@@ -1,0 +1,59 @@
+﻿@page "/qualitypage"
+@inject IReportSerivce<QualityDetailReportDTO> reportService
+
+<h3>Raport jakościowy</h3>
+@if (qualityList == null)
+{
+    <LoadingData DisplayMessage="false"></LoadingData>
+}
+else if (qualityList.Count == 0)
+{
+    <text> Brak danych do wyświetlenia </text>
+}
+else
+{
+    <GridView Items="qualityList">
+        <GridColumns>
+            <GridColumn ColumnTitle="Wrt. nominału"></GridColumn>
+            <GridColumn ColumnTitle="Łączna ilość nominału"></GridColumn>
+            <GridColumn ColumnTitle="Ilość z kryterium"></GridColumn>
+            <GridColumn ColumnTitle="Kryterium"></GridColumn>
+            <GridColumn ColumnTitle="Waluta"></GridColumn>
+            <GridColumn ColumnTitle="Tryb"></GridColumn>
+        </GridColumns>
+        <GridRow Context="quality">
+            <td><b>@quality.FaceValue</b> </td>
+            <td><b>@quality.CountedCount.ToString("### ### ### ###")</b> </td>
+            <td><b>@quality.Count.ToString("### ### ### ###")</b> </td>
+            <td><b>@quality.QualityValue</b> </td>
+            <td><b>@quality.Symbol</b> </td>
+            <td><b>@quality.ModeValue</b> </td>
+        </GridRow>
+    </GridView>
+}
+
+<br />
+<nav class="nav nav-pills flex-column flex-sm-row">
+    <a class="flex-sm-fill text-sm-center nav-link active" href="/reportstochoose">Wróć do poprzedniej storny</a>
+</nav>
+@code {
+    public QualityDetailReportDTO quality { get; set; }
+    public List<QualityDetailReportDTO> qualityList { get; set; }
+
+    protected override void OnInitialized()
+    {
+        quality = new QualityDetailReportDTO();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await LoadData();
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task LoadData()
+    {
+        qualityList = await reportService.GetAllAsync("qualitydetail/get");
+        StateHasChanged();
+    }
+}
