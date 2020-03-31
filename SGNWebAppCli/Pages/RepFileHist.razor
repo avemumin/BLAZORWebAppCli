@@ -1,0 +1,54 @@
+﻿@page "/repfilehist"
+@inject IReportSerivce<FileHistoryDTO> reportService
+
+@if (rfhList == null)
+{
+    <LoadingData DisplayMessage="false"></LoadingData>
+}
+else if (rfhList.Count == 0)
+{
+    <text> Brak danych do wyświetlenia </text>
+}
+else
+{
+    <GridView Items="rfhList">
+        <GridColumns>
+            <GridColumn ColumnTitle="ID"></GridColumn>
+            <GridColumn ColumnTitle="Nazwa pliku"></GridColumn>
+            <GridColumn ColumnTitle="Powodzenie"></GridColumn>
+            <GridColumn ColumnTitle="Opis błędu"></GridColumn>
+            <GridColumn ColumnTitle="Data"></GridColumn>
+            <GridColumn ColumnTitle="Id zliczenia"></GridColumn>
+        </GridColumns>
+        <GridRow Context="rfh">
+            <td><b>@rfh.IdFileHistory</b> </td>
+            <td><b>@rfh.FileName</b> </td>
+            <td><b>@rfh.IsProceededSuccess</b> </td>
+            <td><b>@rfh.ErrorDescription</b> </td>
+            <td><b>@rfh.ProcessDate</b> </td>
+            <td><b>@rfh.IdCountResult</b> </td>
+        </GridRow>
+    </GridView>
+}
+
+@code {
+    public FileHistoryDTO rfh { get; set; }
+    public List<FileHistoryDTO> rfhList { get; set; }
+
+    protected override void OnInitialized()
+    {
+        rfh = new FileHistoryDTO();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await LoadData();
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task LoadData()
+    {
+        rfhList = await reportService.GetAllAsync("reportfilehistory/get");
+        StateHasChanged();
+    }
+}

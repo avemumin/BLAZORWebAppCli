@@ -38,6 +38,7 @@ namespace SGNWebAppCli
             services.AddBlazoredLocalStorage();
             services.AddHttpClient<IReportSerivce<QualityDetailReportDTO>, ReportService<QualityDetailReportDTO>>();
             services.AddHttpClient<IReportSerivce<QualityDetailReportAndMachineDTO>, ReportService<QualityDetailReportAndMachineDTO>>();
+            services.AddHttpClient<IReportSerivce<FileHistoryDTO>, ReportService<FileHistoryDTO>>();
             services.AddSingleton<HttpClient>();
         }
 
