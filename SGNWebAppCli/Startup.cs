@@ -39,6 +39,9 @@ namespace SGNWebAppCli
             services.AddHttpClient<IReportSerivce<QualityDetailReportDTO>, ReportService<QualityDetailReportDTO>>();
             services.AddHttpClient<IReportSerivce<QualityDetailReportAndMachineDTO>, ReportService<QualityDetailReportAndMachineDTO>>();
             services.AddHttpClient<IReportSerivce<FileHistoryDTO>, ReportService<FileHistoryDTO>>();
+            services.AddHttpClient<IReportSerivce<DictionaryCurrency>, ReportService<DictionaryCurrency>>();
+            services.AddHttpClient<IReportSerivce<DictionaryMode>, ReportService<DictionaryMode>>();
+            services.AddHttpClient<IReportSerivce<DictionaryQuality>, ReportService<DictionaryQuality>>();
             services.AddSingleton<HttpClient>();
         }
 

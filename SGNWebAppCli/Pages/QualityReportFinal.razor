@@ -1,0 +1,51 @@
+﻿@page "/qualityreportfinal"
+@inject IReportSerivce<QualityDetailReportDTO> reportService
+
+@if (IsSearchExecuted == true)
+{
+    <LoadingData DisplayMessage="true"></LoadingData>
+}
+else if (qualityreportdto.Count == 0)
+{
+    <NothingToDisplay></NothingToDisplay>
+    <RadzenButton Click="executeSearching" Text="Wyszukaj"></RadzenButton>
+}
+else
+{
+    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="18"
+                AllowSorting="true" Data="@qualityreportdto" TItem="QualityDetailReportDTO" ColumnWidth="150px">
+        <Columns>
+            <RadzenGridColumn TItem="QualityDetailReportDTO" Property="FaceValue" Title="Wrt. nominału" TextAlign="TextAlign.Center" />
+            <RadzenGridColumn TItem="QualityDetailReportDTO" Property="CountedCount" Title="Łączna ilość nominału" TextAlign="TextAlign.Center" FormatString="{0:###  ###  ###  ###}" />
+            <RadzenGridColumn TItem="QualityDetailReportDTO" Property="Count" Title="Ilość z kryterium" TextAlign="TextAlign.Center" FormatString="{0:###  ###  ###  ###}" />
+            <RadzenGridColumn TItem="QualityDetailReportDTO" Property="QualityValue" Title="Kryterium" TextAlign="TextAlign.Right" />
+            <RadzenGridColumn TItem="QualityDetailReportDTO" Property="Symbol" Title="Waluta" TextAlign="TextAlign.Right" />
+            <RadzenGridColumn TItem="QualityDetailReportDTO" Property="ModeValue" Title="Tryb" TextAlign="TextAlign.Right" />
+        </Columns>
+    </RadzenGrid>
+}
+<br />
+@if (qualityreportdto.Count != 0)
+{
+    <nav class="nav nav-pills flex-column flex-sm-row">
+        <a class="flex-sm-fill text-sm-center nav-link active" href="/reportstochoose">Wróć do poprzedniej storny</a>
+    </nav>
+}
+@code {
+    private bool IsSearchExecuted { get; set; } = false;
+    List<QualityDetailReportDTO> qualityreportdto { get; set; }
+    protected override void OnInitialized()
+    {
+        qualityreportdto = new List<QualityDetailReportDTO>();
+        StateHasChanged();
+    }
+    private async void executeSearching()
+    {
+        IsSearchExecuted = true;
+        await Task.Delay(2000);
+        qualityreportdto = await reportService.GetAllAsync("qualitydetail/get");
+        IsSearchExecuted = false;
+        StateHasChanged();
+    }
+
+}
