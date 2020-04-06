@@ -68,9 +68,29 @@
 
         </div>
     </div>
-
-
 </div>
+
+@if(DisplayError == true)
+{
+    <div style="align-content:center;width:auto">
+        <div style="align-content:center;width:620px ">
+            <RadzenTextBox Visible="@CheckCurrency" Disabled="true" Value="Proszę uzupełnić Walutę"
+                           Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
+        </div>
+        <div style="align-content:center;width:620px">
+            <RadzenTextBox Visible="@CheckMode" Disabled="true" Value="Proszę uzupełnić Tryb zliczenia"
+                           Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
+        </div>
+        <div style="align-content:center;width:620px">
+            <RadzenTextBox Visible="@CheckQuality" Disabled="true" Value="Proszę uzupełnić Jakość banknotu"
+                           Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
+        </div>
+        <div style="align-content:center;width:620px">
+            <RadzenTextBox Visible="@CheckDateStampCorrect" Disabled="true" Value="Data początkowa nie może być większa od końcowej"
+                           Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
+        </div>
+    </div>
+}
 <br />
 @if (IsSearchExecuted == true)
 {
@@ -111,7 +131,10 @@ else
     private List<QualityDetailReportDTO> qualityreportdto { get; set; }
     private bool AfterExecuted { get; set; } = false;
 
-    //property converts datetime to begining day and end day 
+    //check filter correct
+    private bool DisplayError { get; set; } = false;
+
+    //property converts datetime to begining day and end day
     private DateTime FromDate { get { return new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 00, 00, 00); } }
     private DateTime ToDate { get { return new DateTime(EndDate.Year, EndDate.Month, EndDate.Day, 23, 59, 59); } }
 
@@ -138,7 +161,7 @@ else
     private Dictionary<DateTime, string> eventsMode = new Dictionary<DateTime, string>();
 
 
-    
+
     #endregion
 
     #region methods
@@ -161,6 +184,9 @@ else
 
             StartDate = DateTime.Now.AddDays(-3);
             EndDate = DateTime.Now;
+
+
+
             StateHasChanged();
         }
         catch (Exception ex)
@@ -170,6 +196,12 @@ else
     }
     private async void executeSearching()
     {
+        DisplayError = false;
+        if (CheckCurrency == true || CheckMode == true || CheckQuality == true || CheckDateStampCorrect == true)
+        {
+            DisplayError = true;
+            return;
+        }
         try
         {
             IsSearchExecuted = true;
@@ -185,6 +217,43 @@ else
         }
     }
 
+    private bool CheckDateStampCorrect
+    {
+        get
+        {
+            if (FromDate < ToDate)
+                return false;
+            return true;
+
+        }
+    }
+    private bool CheckCurrency
+    {
+        get
+        {
+            if (CurrencyPropertyKey.Count() > 0)
+                return false;
+            return true;
+        }
+    }
+    private bool CheckQuality
+    {
+        get
+        {
+            if (QualityPropertyKey.Count() > 0)
+                return false;
+            return true;
+        }
+    }
+    private bool CheckMode
+    {
+        get
+        {
+            if (ModePropertyKey.Count() > 0)
+                return false;
+            return true;
+        }
+    }
 
     private void ChangeCurrencyDictionary(object value, string currnecy)
     {
@@ -208,6 +277,7 @@ else
         var strqd = value is IEnumerable<short> ? string.Join(",", (IEnumerable<short>)value) : value;
         eventsQuality.Add(DateTime.Now, $"Wybrano jakość: {strqd.ToString()}");
         QualityPropertyKey = strqd.ToString();
+
         StateHasChanged();
     }
     #endregion
