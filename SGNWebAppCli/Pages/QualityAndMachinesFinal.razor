@@ -97,7 +97,7 @@
 {
     <LoadingData DisplayMessage="true"></LoadingData>
 }
-else if (qualityreporMachinestdto.Count == 0)
+else if (qualityreporMachinestdto==null || qualityreporMachinestdto.Count == 0)
 {
     @if (AfterExecuted)
     {
@@ -122,12 +122,7 @@ else
     </RadzenGrid>
 }
 <br />
-@if (qualityreporMachinestdto.Count != 0)
-{
-    <nav class="nav nav-pills flex-column flex-sm-row">
-        <a class="flex-sm-fill text-sm-center nav-link active" href="/reportstochoose">Wróć do poprzedniej storny</a>
-    </nav>
-}
+
 
 @code {
 
@@ -202,6 +197,7 @@ else
     }
     private async void executeSearching()
     {
+        qualityreporMachinestdto = new List<QualityDetailReportAndMachineDTO>();
         DisplayError = false;
         if (CheckCurrency == true || CheckMode == true || CheckQuality == true || CheckDateStampCorrect == true)
         {
@@ -212,7 +208,7 @@ else
         {
             IsSearchExecuted = true;
             await Task.Delay(2000);
-            qualityreporMachinestdto = await reportService.GetAllAsync("QualityDetailAndMachine/get");
+            qualityreporMachinestdto = await reportService.GetAllAsync($"QualityDetailAndMachine/get/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
             StateHasChanged();

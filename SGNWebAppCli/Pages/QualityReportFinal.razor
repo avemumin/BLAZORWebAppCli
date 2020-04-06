@@ -96,7 +96,7 @@
 {
     <LoadingData DisplayMessage="true"></LoadingData>
 }
-else if (qualityreportdto.Count == 0)
+else if (qualityreportdto==null || qualityreportdto.Count == 0)
 {
     @if (AfterExecuted)
     {
@@ -194,8 +194,10 @@ else
             throw new Exception(ex.Message.ToString());
         }
     }
+
     private async void executeSearching()
     {
+        qualityreportdto = new List<QualityDetailReportDTO>();
         DisplayError = false;
         if (CheckCurrency == true || CheckMode == true || CheckQuality == true || CheckDateStampCorrect == true)
         {
@@ -204,9 +206,10 @@ else
         }
         try
         {
+
             IsSearchExecuted = true;
             await Task.Delay(2000);
-            qualityreportdto = await reportService.GetAllAsync("qualitydetail/get");
+            qualityreportdto = await reportService.GetAllAsync($"qualitydetail/get/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
             StateHasChanged();
