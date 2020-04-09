@@ -42,7 +42,7 @@ namespace SGNWebAppCli
             services.AddHttpClient<IReportSerivce<QualityDetailReportDTO>, ReportService<QualityDetailReportDTO>>();
             services.AddHttpClient<IReportSerivce<QualityDetailReportAndMachineDTO>, ReportService<QualityDetailReportAndMachineDTO>>();
             services.AddHttpClient<IReportSerivce<FileHistoryDTO>, ReportService<FileHistoryDTO>>();
-      
+            services.AddHttpClient<IReportSerivce<SerialNumbersDuplicatesDTO>,ReportService<SerialNumbersDuplicatesDTO>>();
             services.AddSingleton<HttpClient>();
         }
 

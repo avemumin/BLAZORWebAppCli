@@ -54,7 +54,7 @@
         <hr />
         <div>
 
-            <p style="text-align:center">Od dnia:</p>
+            <p style="text-align:center">Do dnia:</p>
             <RadzenDatePicker ShowTime="false"
                               @bind-Value="@EndDate"
                               DateFormat="dd-MM-yyyy"
@@ -75,19 +75,19 @@
 {
     <div style="align-content:center;width:auto">
         <div style="align-content:center;width:620px ">
-            <RadzenTextBox Visible="@CheckCurrency" Disabled="true" Value="Proszę uzupełnić Walutę"
+            <RadzenTextBox Visible="@CheckCurrency" Disabled="true" Value="Nie uzupełniono filtra 'WALUTA' "
                            Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
         </div>
         <div style="align-content:center;width:620px">
-            <RadzenTextBox Visible="@CheckMode" Disabled="true" Value="Proszę uzupełnić Tryb zliczenia"
+            <RadzenTextBox Visible="@CheckMode" Disabled="true" Value="Nie uzupełniono filtra 'TRYB ZLICZENIA' "
                            Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
         </div>
         <div style="align-content:center;width:620px">
-            <RadzenTextBox Visible="@CheckQuality" Disabled="true" Value="Proszę uzupełnić Jakość banknotu"
+            <RadzenTextBox Visible="@CheckQuality" Disabled="true" Value="Nie uzupełniono filtra  'JAKOŚĆ BANKNOTU'"
                            Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
         </div>
         <div style="align-content:center;width:620px">
-            <RadzenTextBox Visible="@CheckDateStampCorrect" Disabled="true" Value="Data początkowa nie może być większa od końcowej"
+            <RadzenTextBox Visible="@CheckDateStampCorrect" Disabled="true" Value="'DATA OD' nie może być większa niż 'DATA DO'"
                            Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
         </div>
     </div>
@@ -97,7 +97,7 @@
 {
     <LoadingData DisplayMessage="true"></LoadingData>
 }
-else if (qualityreporMachinestdto==null || qualityreporMachinestdto.Count == 0)
+else if (QualityreporMachinestdto == null || QualityreporMachinestdto.Count == 0)
 {
     @if (AfterExecuted)
     {
@@ -108,7 +108,7 @@ else if (qualityreporMachinestdto==null || qualityreporMachinestdto.Count == 0)
 else
 {
     <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="18"
-                AllowSorting="true" Data="@qualityreporMachinestdto" TItem="QualityDetailReportAndMachineDTO" ColumnWidth="150px">
+                AllowSorting="true" Data="@QualityreporMachinestdto" TItem="QualityDetailReportAndMachineDTO" ColumnWidth="150px">
         <Columns>
             @*<RadzenGridColumn TItem="QualityDetailReportAndMachineDTO" Property="IdMachine" Title="Id.Urządzenia" />*@
             <RadzenGridColumn TItem="QualityDetailReportAndMachineDTO" Property="SN" Title="Nr.Seryjny" TextAlign="TextAlign.Center" />
@@ -126,7 +126,7 @@ else
 
 @code {
 
-    List<QualityDetailReportAndMachineDTO> qualityreporMachinestdto { get; set; }
+    List<QualityDetailReportAndMachineDTO> QualityreporMachinestdto { get; set; }
     #region properties and collections
     private bool IsSearchExecuted { get; set; } = false;
 
@@ -170,7 +170,7 @@ else
     {
         try
         {
-            qualityreporMachinestdto = new List<QualityDetailReportAndMachineDTO>();
+            QualityreporMachinestdto = new List<QualityDetailReportAndMachineDTO>();
             dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("DictionaryCurrency/GetAllCurrency");
             dictionaryQualities = await dictionaryQualityService.GetAllAsync("DictionaryQuality/GetAllQuality");
             dictionaryModes = await dictionaryModeService.GetAllAsync("DictionaryMode/GetAllMode");
@@ -197,7 +197,7 @@ else
     }
     private async void executeSearching()
     {
-        qualityreporMachinestdto = new List<QualityDetailReportAndMachineDTO>();
+        QualityreporMachinestdto = new List<QualityDetailReportAndMachineDTO>();
         DisplayError = false;
         if (CheckCurrency == true || CheckMode == true || CheckQuality == true || CheckDateStampCorrect == true)
         {
@@ -208,7 +208,7 @@ else
         {
             IsSearchExecuted = true;
             await Task.Delay(2000);
-            qualityreporMachinestdto = await reportService.GetAllAsync($"QualityDetailAndMachine/get/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
+            QualityreporMachinestdto = await reportService.GetAllAsync($"QualityDetailAndMachine/get/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
             StateHasChanged();
