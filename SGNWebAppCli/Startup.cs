@@ -36,13 +36,14 @@ namespace SGNWebAppCli
             services.Configure<AppSettings>(appSettingSection);
 
             services.AddBlazoredLocalStorage();
-            services.AddHttpClient<IReportSerivce<DictionaryCurrency>, ReportService<DictionaryCurrency>>();
-            services.AddHttpClient<IReportSerivce<DictionaryMode>, ReportService<DictionaryMode>>();
-            services.AddHttpClient<IReportSerivce<DictionaryQuality>, ReportService<DictionaryQuality>>();
-            services.AddHttpClient<IReportSerivce<QualityDetailReportDTO>, ReportService<QualityDetailReportDTO>>();
-            services.AddHttpClient<IReportSerivce<QualityDetailReportAndMachineDTO>, ReportService<QualityDetailReportAndMachineDTO>>();
-            services.AddHttpClient<IReportSerivce<FileHistoryDTO>, ReportService<FileHistoryDTO>>();
-            services.AddHttpClient<IReportSerivce<SerialNumbersDuplicatesDTO>,ReportService<SerialNumbersDuplicatesDTO>>();
+            services.AddHttpClient<IReportSerivce<Currency>, ReportService<Currency>>();
+            services.AddHttpClient<IReportSerivce<Mode>, ReportService<Mode>>();
+            services.AddHttpClient<IReportSerivce<Quality>, ReportService<Quality>>();
+            services.AddHttpClient<IReportSerivce<QualityDetail>, ReportService<QualityDetail>>();
+            services.AddHttpClient<IReportSerivce<Machine>,ReportService<Machine>>();
+            services.AddHttpClient<IReportSerivce<QualityDetailAndMachine>, ReportService<QualityDetailAndMachine>>();
+            services.AddHttpClient<IReportSerivce<FileHistory>, ReportService<FileHistory>>();
+            services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>,ReportService<SerialNumbersDuplicates>>();
             services.AddSingleton<HttpClient>();
         }
 

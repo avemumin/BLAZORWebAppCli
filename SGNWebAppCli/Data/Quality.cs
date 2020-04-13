@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SGNWebAppCli.Data
 {
-    public class DictionaryQuality
+    public class Quality
     {
         public short IdQuality { get; set; }
         public string QualityValue { get; set; }

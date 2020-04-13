@@ -2,7 +2,7 @@
 
 namespace SGNWebAppCli.Data
 {
-    public class FileHistoryDTO
+    public class FileHistory
     {
         public long IdFileHistory { get; set; }
         public string FileName { get; set; }

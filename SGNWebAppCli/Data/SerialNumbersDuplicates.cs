@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SGNWebAppCli.Data
 {
-    public class SerialNumbersDuplicatesDTO
+    public class SerialNumbersDuplicates
     {
         public int IdMachine { get; set; }
         public string SN { get; set; }

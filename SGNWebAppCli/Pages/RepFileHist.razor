@@ -1,5 +1,5 @@
 ﻿@page "/repfilehist"
-@inject IReportSerivce<FileHistoryDTO> reportService
+@inject IReportSerivce<FileHistory> reportService
 
 @if (rfhList == null)
 {
@@ -32,12 +32,12 @@ else
 }
 
 @code {
-    public FileHistoryDTO rfh { get; set; }
-    public List<FileHistoryDTO> rfhList { get; set; }
+    public FileHistory rfh { get; set; }
+    public List<FileHistory> rfhList { get; set; }
 
     protected override void OnInitialized()
     {
-        rfh = new FileHistoryDTO();
+        rfh = new FileHistory();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

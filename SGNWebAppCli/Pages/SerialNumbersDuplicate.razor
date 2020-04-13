@@ -1,6 +1,6 @@
 ﻿@page "/banknotesnduplication"
-@inject IReportSerivce<SerialNumbersDuplicatesDTO> reportService
-@inject IReportSerivce<DictionaryCurrency> dictionaryCurrencyService
+@inject IReportSerivce<SerialNumbersDuplicates> reportService
+@inject IReportSerivce<Currency> dictionaryCurrencyService
 
 
 <p style="font-size:16px;text-align:center"><b>Raport duplikatów</b></p>
@@ -62,7 +62,7 @@
 {
     <LoadingData DisplayMessage="true"></LoadingData>
 }
-else if (DuplicatesDTOs == null || DuplicatesDTOs.Count == 0)
+else if (DuplicatesList == null || DuplicatesList.Count == 0)
 {
     @if (AfterExecuted)
     {
@@ -76,14 +76,14 @@ else
     <div>
         <br />
         <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-                    AllowSorting="true" Data="@DuplicatesDTOs" TItem="SerialNumbersDuplicatesDTO" ColumnWidth="150px">
+                    AllowSorting="true" Data="@DuplicatesList" TItem="SerialNumbersDuplicates" ColumnWidth="150px">
             <Columns>
-                @*<RadzenGridColumn TItem="SerialNumbersDuplicatesDTO" Property="IdMachine" Title="Id" TextAlign="TextAlign.Center" />*@
-                <RadzenGridColumn TItem="SerialNumbersDuplicatesDTO" Property="SN" Title="Numer urządzenia" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicatesDTO" Property="Counts" Title="Powtórzenia" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicatesDTO" Property="BanknoteSN" Title="Numer seryjny banknotu" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicatesDTO" Property="FaceValue" Title="Nominał" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicatesDTO" Property="Symbol" Title="Waluta" TextAlign="TextAlign.Center" />
+                @*<RadzenGridColumn TItem="SerialNumbersDuplicates" Property="IdMachine" Title="Id" TextAlign="TextAlign.Center" />*@
+                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="SN" Title="Numer urządzenia" TextAlign="TextAlign.Center" />
+                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="Counts" Title="Powtórzenia" TextAlign="TextAlign.Center" />
+                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="BanknoteSN" Title="Numer seryjny banknotu" TextAlign="TextAlign.Center" />
+                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="FaceValue" Title="Nominał" TextAlign="TextAlign.Center" />
+                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="Symbol" Title="Waluta" TextAlign="TextAlign.Center" />
             </Columns>
         </RadzenGrid>
     </div>
@@ -91,7 +91,7 @@ else
 
 @code {
     private bool IsSearchExecuted { get; set; } = false;
-    List<SerialNumbersDuplicatesDTO> DuplicatesDTOs;
+    List<SerialNumbersDuplicates> DuplicatesList;
     private bool AfterExecuted { get; set; } = false;
 
     //check filter correct
@@ -107,7 +107,7 @@ else
     //słownik Walut
 
     private string CurrencyPropertyKey { get; set; } = "";
-    private IEnumerable<DictionaryCurrency> dictionaryCurrencies { get; set; }
+    private IEnumerable<Currency> dictionaryCurrencies { get; set; }
     private IEnumerable<short> dictionaryCurrenciesId;
     private Dictionary<DateTime, string> eventsCurrency = new Dictionary<DateTime, string>();
 
@@ -117,8 +117,8 @@ else
     {
         try
         {
-            DuplicatesDTOs = new List<SerialNumbersDuplicatesDTO>();
-            dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("DictionaryCurrency/GetAllCurrency");
+            DuplicatesList = new List<SerialNumbersDuplicates>();
+            dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currencies/");
             dictionaryCurrenciesId = dictionaryCurrencies.Select(x => x.IdCurrency);
             CurrencyPropertyKey = string.Join(",", (IEnumerable<short>)dictionaryCurrenciesId);
             StartDate = DateTime.Now.AddDays(-3);
@@ -137,7 +137,7 @@ else
 
     private async void executeSearching()
     {
-        DuplicatesDTOs = new List<SerialNumbersDuplicatesDTO>();
+        DuplicatesList = new List<SerialNumbersDuplicates>();
         DisplayError = false;
         if (CheckCurrency == true || CheckDateStampCorrect == true)
         {
@@ -149,7 +149,7 @@ else
 
             IsSearchExecuted = true;
             //await Task.Delay(2000);
-            DuplicatesDTOs = await reportService.GetAllAsync($"SerialNumbersDuplicates/GetByDate/{CurrencyPropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
+            DuplicatesList = await reportService.GetAllAsync($"SerialNumbersDuplicates/GetByDate/{CurrencyPropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
             StateHasChanged();

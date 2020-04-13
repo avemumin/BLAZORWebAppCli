@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SGNWebAppCli.Data
 {
-    public class DictionaryCurrency
+    public class Currency
     {
         public short IdCurrency { get; set; }
         public string Name { get; set; }

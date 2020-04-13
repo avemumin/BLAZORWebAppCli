@@ -1,0 +1,376 @@
+﻿@page "/qualityreportmachines"
+
+@inject IReportSerivce<QualityDetailAndMachine> reportService
+@inject IReportSerivce<Currency> dictionaryCurrencyService
+@inject IReportSerivce<Mode> dictionaryModeService
+@inject IReportSerivce<Quality> dictionaryQualityService
+@inject IReportSerivce<Machine> machineService
+
+@if (displayFilters == true)
+{
+    <div class="container" style="position:absolute;width:auto;">
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <div class="border">
+                        <div style="margin:5px 5px 5px 5px;">
+                            <p style="text-align:center"><b>Waluta</b> </p>
+                            <RadzenListBox AllowFiltering="false"
+                                           FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                           @bind-Value="dictionaryCurrenciesId"
+                                           Multiple="true"
+                                           Data="@dictionaryCurrencies"
+                                           TextProperty="Symbol"
+                                           ValueProperty="IdCurrency"
+                                           Change="@(args => ChangeCurrencyDictionary(args, string.Empty))"
+                                           Style="height:252px;width:auto" />
+                        </div>
+                    </div>
+                    <div class="border">
+                        <div style="margin:5px 5px 5px 5px;">
+                            <p style="text-align:center"><b>Tryb zliczenia</b> </p>
+                            <RadzenListBox AllowFiltering="false"
+                                           FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                           @bind-Value="dictionaryModesId"
+                                           Multiple="true"
+                                           Data="@dictionaryModes"
+                                           TextProperty="ModeValue"
+                                           ValueProperty="IdMode"
+                                           Change="@(args => ChangeModeDictionary(args, string.Empty))"
+                                           Style="height:252px;width:auto" />
+                        </div>
+                    </div>
+                    <div class="border">
+                        <div style="margin:5px 5px 5px 5px;">
+                            <p style="text-align:center"><b>Jakość banknotu</b> </p>
+                            <RadzenListBox AllowFiltering="false"
+                                           FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                           @bind-Value="dictionaryQualitiesId"
+                                           Multiple="true"
+                                           Data="@dictionaryQualities"
+                                           TextProperty="QualityValue"
+                                           ValueProperty="IdQuality"
+                                           Change="@(args => ChangeQualityDictionary(args, string.Empty))"
+                                           Style="height:252px;width:auto" />
+                        </div>
+                    </div>
+                    <div class="border" style="margin:0px 5px 0px 5px">
+                        <div style="margin:5px 5px 5px 5px;height:252px;width:auto">
+                            <div style="margin:5px 5px 0px 5px">
+                                <p style="text-align:center"><b>Od dnia:</b></p>
+                                <RadzenDatePicker ShowTime="false"
+                                                  @bind-Value="@StartDate"
+                                                  DateFormat="dd-MM-yyyy"
+                                                  ReadOnly="true" />
+
+                            </div>
+
+                            <div style="margin:5px 5px 0px 5px">
+                                <p style="text-align:center"><b>Do dnia:</b></p>
+                                <RadzenDatePicker ShowTime="false"
+                                                  @bind-Value="@EndDate"
+                                                  DateFormat="dd-MM-yyyy"
+                                                  ReadOnly="true" />
+                            </div>
+
+                            <div style="margin:5px 5px 0px 5px; position:center">
+                                <RadzenButton Click="executeSearching" Text="Wyszukaj"></RadzenButton>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="border">
+                @if (DisplayError == true)
+                {
+                    <div style="align-content:center;width:auto">
+                        <div style="align-content:center;width:620px ">
+                            <RadzenTextBox Visible="@CheckCurrency" Disabled="true" Value="Nie uzupełniono filtra 'WALUTA' "
+                                           Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
+                        </div>
+                        <div style="align-content:center;width:620px">
+                            <RadzenTextBox Visible="@CheckMode" Disabled="true" Value="Nie uzupełniono filtra 'TRYB ZLICZENIA' "
+                                           Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
+                        </div>
+                        <div style="align-content:center;width:620px">
+                            <RadzenTextBox Visible="@CheckQuality" Disabled="true" Value="Nie uzupełniono filtra  'JAKOŚĆ BANKNOTU'"
+                                           Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
+                        </div>
+                        <div style="align-content:center;width:620px">
+                            <RadzenTextBox Visible="@CheckDateStampCorrect" Disabled="true" Value="'DATA OD' nie może być większa niż 'DATA DO'"
+                                           Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="row" >
+            @if (IsSearchExecuted == true)
+            {
+
+                <LoadingData DisplayMessage="true"></LoadingData>
+
+            }
+            else if (QualityMachinesList == null || QualityMachinesList.Count == 0)
+            {
+                @if (AfterExecuted)
+                {
+                    <p style="color:red;font-size:16px;font-weight:bold">Brak wyników dla podanych kryteriów</p>
+                }
+
+            }
+            else
+            {
+                <div style="display:inline-flex;height:auto;width:1200px">
+                    <div class=" border">
+                        <div>
+                            <RadzenTabs>
+                                <Tabs>
+                                    <RadzenTabsItem Text="Urządzenie">
+                                        <RadzenGrid Data="@MachinesCollection"
+                                                    TItem="Machine"
+                                                    AllowFiltering="true"
+                                                    AllowSorting="true"
+                                                    FilterDelay="150"
+                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                    AllowPaging="true"
+                                                    PageSize="10"
+                                                    RowSelect="@(arg=>machine=arg)"
+                                                    Style="width:400px;height:540px">
+                                            <Columns>
+                                                <RadzenGridColumn Title="Numer urządzenia" 
+                                                                  TItem="Machine"
+                                                                  Property="Sn">
+                                                </RadzenGridColumn>
+
+                                            </Columns>
+                                        </RadzenGrid>
+                                    </RadzenTabsItem>
+                                </Tabs>
+                            </RadzenTabs>
+                        </div>
+                    </div>
+                    <div class="border">
+                        <div>
+                            <RadzenTabs>
+                                <Tabs>
+                                    <RadzenTabsItem Text="Szczegóły">
+                                        <RadzenGrid Data="@machine.QualityDetails"
+                                                    AllowFiltering="true"
+                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                    AllowSorting="true"
+                                                    AllowPaging="true"
+                                                    TItem="QualityDetailAndMachine"
+                                                    Style="width:1000px;height:540px">
+                                            <Columns>
+                                                <RadzenGridColumn Filterable="false" TItem="QualityDetailAndMachine" Property="SN" Title="Nr urzadzenia"></RadzenGridColumn>
+                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="FaceValue" Title="Wrt. nominału"></RadzenGridColumn>
+                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="Count" Title="Ilość wystąpień" FormatString="{0:###  ###  ###  ###}"></RadzenGridColumn>
+                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="QualityValue" Title="Jakość"></RadzenGridColumn>
+                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="Symbol" Title="Waluta"></RadzenGridColumn>
+                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="ModeValue" Title="Tryb"></RadzenGridColumn>
+                                            </Columns>
+                                        </RadzenGrid>
+                                    </RadzenTabsItem>
+                                </Tabs>
+                            </RadzenTabs>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+
+}
+
+
+
+@code {
+
+    Machine machine = new Machine();
+    //detail view
+    List<QualityDetailAndMachine> QualityMachinesList { get; set; }
+    //master view
+    private IEnumerable<Machine> MachinesCollection;
+
+
+    #region properties and collections
+    private bool IsSearchExecuted { get; set; } = false;
+
+    private bool AfterExecuted { get; set; } = false;
+
+
+
+    //property converts datetime to begining day and end day
+    private DateTime FromDate { get { return new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 00, 00, 00); } }
+    private DateTime ToDate { get { return new DateTime(EndDate.Year, EndDate.Month, EndDate.Day, 23, 59, 59); } }
+
+    //property binding to control
+    private DateTime StartDate { get; set; }
+    private DateTime EndDate { get; set; }
+    //słownik Walut
+
+    private string CurrencyPropertyKey { get; set; } = "";
+    private IEnumerable<Currency> dictionaryCurrencies { get; set; }
+    private IEnumerable<short> dictionaryCurrenciesId;
+    private Dictionary<DateTime, string> eventsCurrency = new Dictionary<DateTime, string>();
+
+    //słownik jakości
+    private string QualityPropertyKey { get; set; } = "";
+    private IEnumerable<Quality> dictionaryQualities { get; set; }
+    private IEnumerable<short> dictionaryQualitiesId;
+    private Dictionary<DateTime, string> eventsQuality = new Dictionary<DateTime, string>();
+
+    //słownik trybu
+    private string ModePropertyKey { get; set; } = "";
+    private IEnumerable<Mode> dictionaryModes { get; set; }
+    private IEnumerable<short> dictionaryModesId;
+    private Dictionary<DateTime, string> eventsMode = new Dictionary<DateTime, string>();
+
+    //urkycie filtrów do momentu gdy załadują się słowniki
+    private bool displayFilters = false;
+
+    #endregion
+
+    #region methods
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            QualityMachinesList = new List<QualityDetailAndMachine>();
+            dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currencies/");
+            dictionaryQualities = await dictionaryQualityService.GetAllAsync("Qualities/");
+            dictionaryModes = await dictionaryModeService.GetAllAsync("Modes/");
+
+
+            dictionaryCurrenciesId = dictionaryCurrencies.Select(x => x.IdCurrency);
+            dictionaryQualitiesId = dictionaryQualities.Select(x => x.IdQuality);
+            dictionaryModesId = dictionaryModes.Select(x => x.IdMode);
+
+            CurrencyPropertyKey = string.Join(",", (IEnumerable<short>)dictionaryCurrenciesId);
+            QualityPropertyKey = string.Join(",", (IEnumerable<short>)dictionaryQualitiesId);
+            ModePropertyKey = string.Join(",", (IEnumerable<short>)dictionaryModesId);
+
+            StartDate = DateTime.Now.AddDays(-3);
+            EndDate = DateTime.Now;
+
+            displayFilters = true;
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message.ToString());
+        }
+    }
+
+    private async void executeSearching()
+    {
+        QualityMachinesList = new List<QualityDetailAndMachine>();
+
+        if (DisplayError == true)
+            return;
+
+        try
+        {
+            IsSearchExecuted = true;
+            QualityMachinesList = await reportService.GetAllAsync($"qualitiesextreport/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
+            MachinesCollection = await Task.Run(() => MachineList());
+            IsSearchExecuted = false;
+            AfterExecuted = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message.ToString());
+        }
+    }
+
+    private bool CheckDateStampCorrect
+    {
+        get
+        {
+            return FromDate < ToDate ? false : true;
+        }
+    }
+    private bool CheckCurrency
+    {
+        get
+        {
+            return CurrencyPropertyKey.Count() > 0 ? false : true;
+        }
+    }
+    private bool CheckQuality
+    {
+        get
+        {
+            return QualityPropertyKey.Count() > 0 ? false : true;
+        }
+    }
+    private bool CheckMode
+    {
+        get
+        {
+            return ModePropertyKey.Count() > 0 ? false : true;
+        }
+    }
+
+    private bool DisplayError
+    {
+        get
+        {
+            if (CheckCurrency == true || CheckMode == true || CheckQuality == true || CheckDateStampCorrect == true)
+                return true;
+            return false;
+        }
+    }
+    private void ChangeCurrencyDictionary(object value, string currnecy)
+    {
+        CurrencyPropertyKey = string.Empty;
+        var strcd = value is IEnumerable<short> ? string.Join(",", (IEnumerable<short>)value) : value;
+        eventsCurrency.Add(DateTime.Now, $"Wybrano waluty: {strcd.ToString()}");
+        CurrencyPropertyKey = strcd.ToString();
+        StateHasChanged();
+    }
+    private void ChangeModeDictionary(object value, string mode)
+    {
+        ModePropertyKey = string.Empty;
+        var strmd = value is IEnumerable<short> ? string.Join(",", (IEnumerable<short>)value) : value;
+        eventsMode.Add(DateTime.Now, $"Wybrano tryby: {strmd.ToString()}");
+        ModePropertyKey = strmd.ToString();
+        StateHasChanged();
+    }
+    private void ChangeQualityDictionary(object value, string quality)
+    {
+        QualityPropertyKey = string.Empty;
+        var strqd = value is IEnumerable<short> ? string.Join(",", (IEnumerable<short>)value) : value;
+        eventsQuality.Add(DateTime.Now, $"Wybrano jakość: {strqd.ToString()}");
+        QualityPropertyKey = strqd.ToString();
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Match master and detail view
+    /// </summary>
+    /// <returns></returns>
+    private async Task<List<Machine>> MachineList()
+    {
+        var machines = await machineService.GetAllAsync("Machines/");
+
+        var newMachineList = new List<Machine>();
+        foreach (var machine in machines)
+        {
+            machine.QualityDetails = QualityMachinesList.Where(m => m.IdMachine == machine.IdMachine).ToList();
+            if (machine.QualityDetails.Count > 0)//zeby nie brac maszyn ktore nic nie przeliczyly dla danego okresu
+                newMachineList.Add(machine);
+        }
+        return await Task.FromResult(newMachineList);
+    }
+    #endregion
+}

@@ -1,9 +1,7 @@
 ﻿namespace SGNWebAppCli.Data
 {
-    public class QualityDetailReportAndMachineDTO
+    public class QualityDetail
     {
-        public int IdMachine { get; set; }
-        public string SN { get; set; }
         public short IdCurrencyFaceValue { get; set; }
         public decimal FaceValue { get; set; }
         public long CountedCount { get; set; }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SGNWebAppCli.Data
 {
-    public class DictionaryMode
+    public class Mode
     {
         public short IdMode { get; set; }
         public string ModeValue { get; set; }
