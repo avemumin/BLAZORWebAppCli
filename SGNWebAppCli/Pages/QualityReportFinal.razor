@@ -1,4 +1,5 @@
 ﻿@page "/qualityreportfinal"
+
 @inject IReportSerivce<QualityDetail> reportService
 @inject IReportSerivce<Currency> dictionaryCurrencyService
 @inject IReportSerivce<Mode> dictionaryModeService
@@ -7,7 +8,7 @@
 @if (displayFilters == true)
 {
     <p style="font-size:16px;text-align:center"><b>Raport jakościowy</b></p>
-    <div style="text-align:center;  font-weight:bold;width:620px;height:300px; background-color:lightgray; display:flex;margin:0px 5px 0px 5px">
+    <div style="text-align:center;  font-weight:bold;width:620px;height:300px; display:flex;margin:0px 5px 0px 5px">
         <div style="width: 150px; height: auto; text-align: left;margin-left:5px">
             <p style="text-align:center">Waluta</p>
             <RadzenListBox AllowFiltering="false"
@@ -133,8 +134,7 @@ else
     private List<QualityDetail> QualityList { get; set; }
     private bool AfterExecuted { get; set; } = false;
 
-    //check filter correct
-    private bool DisplayError { get; set; } = false;
+
 
     //property converts datetime to begining day and end day
     private DateTime FromDate { get { return new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 00, 00, 00); } }
@@ -206,12 +206,11 @@ else
     private async void executeSearching()
     {
         QualityList = new List<QualityDetail>();
-        DisplayError = false;
-        if (CheckCurrency == true || CheckMode == true || CheckQuality == true || CheckDateStampCorrect == true)
-        {
-            DisplayError = true;
+
+
+        if (DisplayError == true)
             return;
-        }
+
         try
         {
 
@@ -232,37 +231,38 @@ else
     {
         get
         {
-            if (FromDate < ToDate)
-                return false;
-            return true;
-
+            return FromDate < ToDate ? false : true;
         }
     }
     private bool CheckCurrency
     {
         get
         {
-            if (CurrencyPropertyKey.Count() > 0)
-                return false;
-            return true;
+            return CurrencyPropertyKey.Count() > 0 ? false : true;
         }
     }
     private bool CheckQuality
     {
         get
         {
-            if (QualityPropertyKey.Count() > 0)
-                return false;
-            return true;
+            return QualityPropertyKey.Count() > 0 ? false : true;
         }
     }
     private bool CheckMode
     {
         get
         {
-            if (ModePropertyKey.Count() > 0)
-                return false;
-            return true;
+            return ModePropertyKey.Count() > 0 ? false : true;
+        }
+    }
+
+    private bool DisplayError
+    {
+        get
+        {
+            if (CheckCurrency == true || CheckMode == true || CheckQuality == true || CheckDateStampCorrect == true)
+                return true;
+            return false;
         }
     }
 

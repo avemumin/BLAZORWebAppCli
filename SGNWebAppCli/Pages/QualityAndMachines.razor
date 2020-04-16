@@ -8,6 +8,7 @@
 
 @if (displayFilters == true)
 {
+    <p style="font-size:16px;text-align:center"><b>Raport jakościowy z podziałem na urządzenia</b></p>
     <div class="container" style="position:absolute;width:auto;">
         <div class="row">
             <div class="col">
@@ -108,7 +109,7 @@
                 }
             </div>
         </div>
-        <div class="row" >
+        <div class="row">
             @if (IsSearchExecuted == true)
             {
 
@@ -142,7 +143,7 @@
                                                     RowSelect="@(arg=>machine=arg)"
                                                     Style="width:400px;height:540px">
                                             <Columns>
-                                                <RadzenGridColumn Title="Numer urządzenia" 
+                                                <RadzenGridColumn Title="Numer urządzenia"
                                                                   TItem="Machine"
                                                                   Property="Sn">
                                                 </RadzenGridColumn>

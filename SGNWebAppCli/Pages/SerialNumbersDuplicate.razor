@@ -4,7 +4,7 @@
 
 
 <p style="font-size:16px;text-align:center"><b>Raport duplikatów</b></p>
-<div style="text-align:center;  font-weight:bold;width:310px;height:300px; background-color:lightgray; display:flex;margin:0px 5px 0px 5px">
+<div style="text-align:center;  font-weight:bold;width:310px;height:300px;  display:flex;margin:0px 5px 0px 5px">
     <div style="width: 150px; height: auto; text-align: left;margin-left:5px">
         <p style="text-align:center">Waluta</p>
         <RadzenListBox AllowFiltering="false"
@@ -118,7 +118,7 @@ else
         try
         {
             DuplicatesList = new List<SerialNumbersDuplicates>();
-            dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currencies/");
+            dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currency/DictionaryCurrency");
             dictionaryCurrenciesId = dictionaryCurrencies.Select(x => x.IdCurrency);
             CurrencyPropertyKey = string.Join(",", (IEnumerable<short>)dictionaryCurrenciesId);
             StartDate = DateTime.Now.AddDays(-3);

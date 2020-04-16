@@ -1,13 +1,13 @@
 ﻿@page "/sprawdzenie"
 
-@inject IReportSerivce<QualityDetailAndMachine> reportService
+@inject IReportSerivce<QualityDetail> reportService
 @inject IReportSerivce<Currency> dictionaryCurrencyService
 @inject IReportSerivce<Mode> dictionaryModeService
 @inject IReportSerivce<Quality> dictionaryQualityService
-@inject IReportSerivce<Machine> machineService
 
 @if (displayFilters == true)
 {
+    <p style="font-size:16px;text-align:center"><b>Raport jakościowy</b></p>
     <div class="container" style="position:absolute;width:auto;">
         <div class="row">
             <div class="col">
@@ -113,7 +113,7 @@
             {
                 <LoadingData DisplayMessage="true"></LoadingData>
             }
-            else if (QualityMachinesList == null || QualityMachinesList.Count == 0)
+            else if (QualityList == null || QualityList.Count == 0)
             {
                 @if (AfterExecuted)
                 {
@@ -126,53 +126,24 @@
                 <div style="display:inline-flex;height:auto;width:1200px">
                     <div class=" border">
                         <div>
-                            <RadzenTabs>
-                                <Tabs>
-                                    <RadzenTabsItem Text="Urządzenie">
-                                        <RadzenGrid Data="@MachinesCollection"
-                                                    TItem="Machine"
-                                                    AllowFiltering="true"
-                                                    AllowSorting="true"
-                                                    FilterDelay="150"
-                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                                    AllowPaging="true"
-                                                    PageSize="10"
-                                                    RowSelect="@(arg=>machine=arg)"
-                                                    Style="width:370px;height:540px">
-                                            <Columns>
-                                                <RadzenGridColumn Title="Numer urządzenia" TItem="Machine" Property="Sn"></RadzenGridColumn>
-                                                @*<RadzenGridColumn Title="Model urządzenia" TItem="Machine" Property="Model"></RadzenGridColumn>*@
-                                            </Columns>
-                                        </RadzenGrid>
-                                    </RadzenTabsItem>
-                                </Tabs>
-                            </RadzenTabs>
-                        </div>
-                    </div>
-                    <div class="border">
-                        <div>
-                            <RadzenTabs>
-                                <Tabs>
-                                    <RadzenTabsItem Text="Szczegóły">
-                                        <RadzenGrid Data="@machine.QualityDetails"
-                                                    AllowFiltering="true"
-                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                                    AllowSorting="true"
-                                                    AllowPaging="true"
-                                                    TItem="QualityDetailAndMachine"
-                                                    Style="width:1000px;height:540px">
-                                            <Columns>
-                                                <RadzenGridColumn Filterable="false" TItem="QualityDetailAndMachine" Property="SN" Title="Nr urzadzenia"></RadzenGridColumn>
-                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="FaceValue" Title="Wrt. nominału"></RadzenGridColumn>
-                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="Count" Title="Ilość wystąpień" FormatString="{0:###  ###  ###  ###}"></RadzenGridColumn>
-                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="QualityValue" Title="Jakość"></RadzenGridColumn>
-                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="Symbol" Title="Waluta"></RadzenGridColumn>
-                                                <RadzenGridColumn TItem="QualityDetailAndMachine" Property="ModeValue" Title="Tryb"></RadzenGridColumn>
-                                            </Columns>
-                                        </RadzenGrid>
-                                    </RadzenTabsItem>
-                                </Tabs>
-                            </RadzenTabs>
+                            <br />
+                            <RadzenGrid AllowFiltering="true" 
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                                        AllowPaging="true" 
+                                        PageSize="10"
+                                        AllowSorting="true"
+                                        Data="@QualityList" 
+                                        TItem="QualityDetail" 
+                                        ColumnWidth="150px">
+                                <Columns>
+                                    <RadzenGridColumn TItem="QualityDetail" Property="FaceValue" Title="Wrt. nominału" TextAlign="TextAlign.Center" />
+                                    @*<RadzenGridColumn TItem="QualityDetail" Property="CountedCount" Title="Łączna ilość nominału" TextAlign="TextAlign.Center" FormatString="{0:###  ###  ###  ###}" />*@
+                                    <RadzenGridColumn TItem="QualityDetail" Property="Count" Title="Ilość z kryterium" TextAlign="TextAlign.Center" FormatString="{0:###  ###  ###  ###}" />
+                                    <RadzenGridColumn TItem="QualityDetail" Property="QualityValue" Title="Kryterium" TextAlign="TextAlign.Right" />
+                                    <RadzenGridColumn TItem="QualityDetail" Property="Symbol" Title="Waluta" TextAlign="TextAlign.Right" />
+                                    <RadzenGridColumn TItem="QualityDetail" Property="ModeValue" Title="Tryb" TextAlign="TextAlign.Right" />
+                                </Columns>
+                            </RadzenGrid>
                         </div>
                     </div>
                 </div>
@@ -187,16 +158,10 @@
 
 @code {
 
-    Machine machine = new Machine();
-    //detail view
-    List<QualityDetailAndMachine> QualityMachinesList { get; set; }
-    //master view
-    private IEnumerable<Machine> MachinesCollection;
-
 
     #region properties and collections
     private bool IsSearchExecuted { get; set; } = false;
-
+    private List<QualityDetail> QualityList { get; set; }
     private bool AfterExecuted { get; set; } = false;
 
 
@@ -227,9 +192,8 @@
     private IEnumerable<short> dictionaryModesId;
     private Dictionary<DateTime, string> eventsMode = new Dictionary<DateTime, string>();
 
-    //urkycie filtrów do momentu gdy załadują się słowniki
-    private bool displayFilters = false;
 
+    private bool displayFilters = false;
     #endregion
 
     #region methods
@@ -237,11 +201,10 @@
     {
         try
         {
-            QualityMachinesList = new List<QualityDetailAndMachine>();
+            QualityList = new List<QualityDetail>();
             dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currencies/");
             dictionaryQualities = await dictionaryQualityService.GetAllAsync("Qualities/");
             dictionaryModes = await dictionaryModeService.GetAllAsync("Modes/");
-
 
             dictionaryCurrenciesId = dictionaryCurrencies.Select(x => x.IdCurrency);
             dictionaryQualitiesId = dictionaryQualities.Select(x => x.IdQuality);
@@ -253,8 +216,8 @@
 
             StartDate = DateTime.Now.AddDays(-3);
             EndDate = DateTime.Now;
-
             displayFilters = true;
+
 
             StateHasChanged();
         }
@@ -263,20 +226,24 @@
             throw new Exception(ex.Message.ToString());
         }
     }
+    protected override void OnAfterRender(bool firstRender)
+    {
+
+        base.OnAfterRender(firstRender);
+    }
+
 
     private async void executeSearching()
     {
-        QualityMachinesList = new List<QualityDetailAndMachine>();
-
+        QualityList = new List<QualityDetail>();
         if (DisplayError == true)
             return;
-
         try
         {
+
             IsSearchExecuted = true;
-            //await Task.Delay(2000);
-            QualityMachinesList = await reportService.GetAllAsync($"qualitiesextreport/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
-            MachinesCollection = await Task.Run(() => MachineList());
+            await Task.Delay(2000);
+            QualityList = await reportService.GetAllAsync($"qualitiesreport/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
             StateHasChanged();
@@ -286,7 +253,6 @@
             throw new Exception(ex.Message.ToString());
         }
     }
-
     private bool CheckDateStampCorrect
     {
         get
@@ -325,6 +291,7 @@
             return false;
         }
     }
+
     private void ChangeCurrencyDictionary(object value, string currnecy)
     {
         CurrencyPropertyKey = string.Empty;
@@ -349,24 +316,6 @@
         QualityPropertyKey = strqd.ToString();
 
         StateHasChanged();
-    }
-
-    /// <summary>
-    /// Match master and detail view
-    /// </summary>
-    /// <returns></returns>
-    private async Task<List<Machine>> MachineList()
-    {
-        var machines = await machineService.GetAllAsync("Machines/");
-
-        var newMachineList = new List<Machine>();
-        foreach (var machine in machines)
-        {
-            machine.QualityDetails = QualityMachinesList.Where(m => m.IdMachine == machine.IdMachine).ToList();
-            if (machine.QualityDetails.Count > 0)
-                newMachineList.Add(machine);
-        }
-        return await Task.FromResult(newMachineList);
     }
     #endregion
 }
