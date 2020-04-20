@@ -1,0 +1,51 @@
+﻿@page "/signup"
+@using SGNWebAppCli.Data
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+
+
+    <EditForm Model="@user" OnValidSubmit="@ValidateUser">
+        <div>
+            <h3 style="font-weight:bold; color:purple">Logowanie</h3>
+        </div>
+        <div>
+            <br />
+        </div>
+        <div class="col-12 row">
+            <input class="form-control col-12" @bind="user.UserEmailAddress" placeholder="email" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <input class="form-control col-12" type="password" @bind="user.UserPassword" placeholder="utwórz hasło" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <input class="form-control col-12" type="password" @bind="user.ConfirmPassword" placeholder="powtórz hasło" />
+        </div>
+        <div class="col-12 row">
+            <span class="col-12"></span>
+            <br />
+            <input type="submit" class="form-control col-6 btn btn-primary" value="Rejestruj" />
+            <a href="/" class="col-4">Wróć</a>
+        </div>
+    </EditForm>
+
+
+@code {
+    private User user;
+    protected override Task OnInitializedAsync()
+    {
+        user = new User();
+        return base.OnInitializedAsync();
+    }
+    private async Task<bool> ValidateUser()
+    {
+        (AuthenticationStateProvider as CustomAuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
+        NavigationManager.NavigateTo("/index");
+
+        await sessionStorage.SetItemAsync("emailAddress", user.UserEmailAddress);
+        return await Task.FromResult(true);
+    }
+}

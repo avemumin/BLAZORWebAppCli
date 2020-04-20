@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
@@ -36,14 +38,26 @@ namespace SGNWebAppCli
             services.Configure<AppSettings>(appSettingSection);
 
             services.AddBlazoredLocalStorage();
+
             services.AddHttpClient<IReportSerivce<Currency>, ReportService<Currency>>();
             services.AddHttpClient<IReportSerivce<Mode>, ReportService<Mode>>();
             services.AddHttpClient<IReportSerivce<Quality>, ReportService<Quality>>();
             services.AddHttpClient<IReportSerivce<QualityDetail>, ReportService<QualityDetail>>();
-            services.AddHttpClient<IReportSerivce<Machine>,ReportService<Machine>>();
+            services.AddHttpClient<IReportSerivce<Machine>, ReportService<Machine>>();
             services.AddHttpClient<IReportSerivce<QualityDetailAndMachine>, ReportService<QualityDetailAndMachine>>();
             services.AddHttpClient<IReportSerivce<FileHistory>, ReportService<FileHistory>>();
-            services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>,ReportService<SerialNumbersDuplicates>>();
+            services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>, ReportService<SerialNumbersDuplicates>>();
+
+
+            services.AddBlazoredSessionStorage();
+            services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+
+            services.AddHttpClient<IUserService, UserService>(config =>
+              {
+                  config.BaseAddress = new Uri("https://localhost:44398/api/Users/");
+                  config.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
+              });
             services.AddSingleton<HttpClient>();
         }
 
@@ -65,6 +79,9 @@ namespace SGNWebAppCli
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

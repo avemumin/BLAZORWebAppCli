@@ -1,4 +1,4 @@
-﻿@page "/qualityreportfinal"
+﻿@page "/qualityreport"
 
 @inject IReportSerivce<QualityDetail> reportService
 @inject IReportSerivce<Currency> dictionaryCurrencyService
@@ -73,7 +73,7 @@
         </div>
     </div>
 }
-@if (DisplayError == true)
+@if (DisplayError == true )
 {
     <div style="align-content:center;width:auto">
         <div style="align-content:center;width:620px ">
@@ -103,7 +103,7 @@ else if (QualityList == null || QualityList.Count == 0)
 {
     @if (AfterExecuted)
     {
-        <p>Brak wyników dla podanych kryteriów</p>
+        <p style="color:red;font-size:16px;font-weight:bold">Brak wyników dla podanych kryteriów</p>
     }
 
 }
@@ -115,7 +115,6 @@ else
                     AllowSorting="true" Data="@QualityList" TItem="QualityDetail" ColumnWidth="150px">
             <Columns>
                 <RadzenGridColumn TItem="QualityDetail" Property="FaceValue" Title="Wrt. nominału" TextAlign="TextAlign.Center" />
-                @*<RadzenGridColumn TItem="QualityDetail" Property="CountedCount" Title="Łączna ilość nominału" TextAlign="TextAlign.Center" FormatString="{0:###  ###  ###  ###}" />*@
                 <RadzenGridColumn TItem="QualityDetail" Property="Count" Title="Ilość z kryterium" TextAlign="TextAlign.Center" FormatString="{0:###  ###  ###  ###}" />
                 <RadzenGridColumn TItem="QualityDetail" Property="QualityValue" Title="Kryterium" TextAlign="TextAlign.Right" />
                 <RadzenGridColumn TItem="QualityDetail" Property="Symbol" Title="Waluta" TextAlign="TextAlign.Right" />

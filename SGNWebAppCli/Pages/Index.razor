@@ -1,4 +1,16 @@
-﻿@page "/"
+﻿@page "/index"
 
-<InfoMainPage></InfoMainPage>
+<AuthorizeView>
+    <Authorized>
+        <p>Witaj: @context.User.Identity.Name</p>
+
+
+        <InfoMainPage></InfoMainPage>
+    </Authorized>
+    <NotAuthorized>
+        <p>You are logged out!!</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@*<InfoMainPage></InfoMainPage>*@
 

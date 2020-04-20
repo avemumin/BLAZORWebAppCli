@@ -1,0 +1,63 @@
+﻿@page "/"
+@using SGNWebAppCli.Data
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IUserService userService
+
+<EditForm Model="@user" OnValidSubmit="@ValidateUser">
+    <div>
+        <h3 style="font-weight:bold; color:purple">Logowanie</h3>
+    </div>
+    <div>
+        <br />
+    </div>
+    <div class="col-12 row">
+        <input class="form-control col-12" @bind="user.UserEmailAddress" placeholder="email" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <input class="form-control col-12" type="password" @bind="user.UserPassword" placeholder="hasło" />
+    </div>
+    <div class="col-12 row">
+        <span class="col-12"></span>
+        <br />
+        <input type="submit" class="form-control col-6 btn btn-primary" value="Zaloguj" />
+        <a href="/signup" class="col-4">Dodaj użytkownika</a>
+    </div>
+    <br />
+    <div class="col-12 row" style="text-align:left;font-weight:bold">
+        <span class="col-12" style="color:red">@LoginMessage</span>
+    </div>
+</EditForm>
+
+
+@code {
+    private User user;
+    public string LoginMessage { get; set; }
+    protected override Task OnInitializedAsync()
+    {
+        user = new User();
+        return base.OnInitializedAsync();
+    }
+    private async Task<bool> ValidateUser()
+    {
+
+        var returnedUser = await userService.LoginAsync(user);
+
+        if (returnedUser.UserEmailAddress != null)
+        {
+            await sessionStorage.SetItemAsync("accessToken", returnedUser.AccessToken);
+            await sessionStorage.SetItemAsync("refreshToken", returnedUser.RefreshToken);
+
+
+            (AuthenticationStateProvider as CustomAuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
+            NavigationManager.NavigateTo("/index");
+        }
+        else
+        {
+            LoginMessage = "Niepoprawny login lub hasło";
+        }
+        return await Task.FromResult(true);
+    }
+}
