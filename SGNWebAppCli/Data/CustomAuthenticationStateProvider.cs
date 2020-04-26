@@ -1,8 +1,5 @@
 ﻿using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,6 +12,8 @@ namespace SGNWebAppCli.Data
         {
             _sessionStorageService = sessionStorageService;
         }
+
+
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
 
@@ -24,7 +23,7 @@ namespace SGNWebAppCli.Data
             {
                  identity = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name,emailAddress),
+                    new Claim(ClaimTypes.Email,emailAddress),
                 }, "apiauth_type");
             }
             else

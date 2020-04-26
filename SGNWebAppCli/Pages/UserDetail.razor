@@ -1,0 +1,30 @@
+﻿@page  "/userlist/userdetail/{userid:int}"
+@page "/userlist/userdetail"
+@page "/user"
+@using SGNWebAppCli.Data
+@using SGNWebAppCli.Services
+@inject IReportSerivce<User> userService
+
+<h3>Szczegóły</h3>
+<div class="col-12 row">
+
+    @if (UserDetails != null)
+    {
+        <h5 class="col-12 row" style="font-weight:bold">@UserDetails.UserName @UserDetails.UserLastName</h5>
+        <h6 class="col-12 row">Aktywny: @UserDetails.IsActive</h6>
+
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public int userid { get; set; }
+
+    public User UserDetails { get; set; }
+
+    //protected async override Task OnInitializedAsync()
+    //{
+    //    UserDetails = await userService.GetByIdAsync("users/GetUser/", userid);
+    //}
+}

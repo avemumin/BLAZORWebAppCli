@@ -1,0 +1,20 @@
+﻿@if (IsVisible)
+{
+    if (Results)
+    {
+        <div class="col-10 alert alert-info">
+            <span>@ChildContent : zapisano poprawnie !!</span>
+        </div>
+    }
+    else
+    {
+        <div class="col-10 alert alert-danger">
+            <span style="font-weight:bold;font-style:italic">Coś poszło nie tak </span>
+        </div>
+    }
+}
+@code {
+    [Parameter] public bool IsVisible { get; set; } = false;
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public bool Results { get; set; }
+}

@@ -47,7 +47,7 @@ namespace SGNWebAppCli
             services.AddHttpClient<IReportSerivce<QualityDetailAndMachine>, ReportService<QualityDetailAndMachine>>();
             services.AddHttpClient<IReportSerivce<FileHistory>, ReportService<FileHistory>>();
             services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>, ReportService<SerialNumbersDuplicates>>();
-
+            services.AddHttpClient<IReportSerivce<User>, ReportService<User>>();
 
             services.AddBlazoredSessionStorage();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

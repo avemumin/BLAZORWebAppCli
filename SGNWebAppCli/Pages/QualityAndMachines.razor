@@ -299,6 +299,7 @@
             return FromDate < ToDate ? false : true;
         }
     }
+
     private bool CheckCurrency
     {
         get
@@ -306,6 +307,7 @@
             return CurrencyPropertyKey.Count() > 0 ? false : true;
         }
     }
+
     private bool CheckQuality
     {
         get
@@ -313,6 +315,7 @@
             return QualityPropertyKey.Count() > 0 ? false : true;
         }
     }
+
     private bool CheckMode
     {
         get
@@ -330,6 +333,7 @@
             return false;
         }
     }
+
     private void ChangeCurrencyDictionary(object value, string currnecy)
     {
         CurrencyPropertyKey = string.Empty;
@@ -338,6 +342,7 @@
         CurrencyPropertyKey = strcd.ToString();
         StateHasChanged();
     }
+
     private void ChangeModeDictionary(object value, string mode)
     {
         ModePropertyKey = string.Empty;
@@ -346,6 +351,7 @@
         ModePropertyKey = strmd.ToString();
         StateHasChanged();
     }
+
     private void ChangeQualityDictionary(object value, string quality)
     {
         QualityPropertyKey = string.Empty;

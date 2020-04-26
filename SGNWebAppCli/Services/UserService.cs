@@ -20,6 +20,7 @@ namespace SGNWebAppCli.Services
         public async Task<User> LoginAsync(User user)
         {
             string serializedUser = JsonConvert.SerializeObject(user);
+
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "Login");
             requestMessage.Content = new StringContent(serializedUser);
 
@@ -35,22 +36,25 @@ namespace SGNWebAppCli.Services
             return await Task.FromResult(returnedUser);
         }
 
-        //public Task<User> RefreshTokenAsync(RefreshRequest refreshRequest)
-        //{
-        //    string serializedUser = JsonConvert.SerializeObject(refreshRequest);
-        //    var requestMessage = new HttpRequestMessage(HttpMethod.Post, "RefreshToken");
-        //    requestMessage.Content = new StringContent(serializedUser);
+        public async Task<User> RefreshTokenAsync(RefreshRequest refreshRequest)
+        {
+            string serializedUser = JsonConvert.SerializeObject(refreshRequest);
 
-        //    requestMessage.Content.Headers.ContentType
-        //        = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "Users/RefreshToken");
+            requestMessage.Content = new StringContent(serializedUser);
 
-        //    var response = await _httpClient.SendAsync(requestMessage);
+            requestMessage.Content.Headers.ContentType
+                = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
-        //    var responseStatusCode = response.StatusCode;
-        //    var responseBody = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.SendAsync(requestMessage);
 
-        //    var returnedUser = JsonConvert.DeserializeObject<User>(responseBody);
-        //    return await Task.FromResult(returnedUser);
-        //}
+            var responseStatusCode = response.StatusCode;
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            var returnedUser = JsonConvert.DeserializeObject<User>(responseBody);
+
+            return await Task.FromResult(returnedUser);
+        }
+
     }
 }

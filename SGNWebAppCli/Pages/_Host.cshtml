@@ -19,7 +19,6 @@
 </head>
 <body>
     <app>
-        @*<component type="typeof(App)" render-mode="ServerPrerendered" />*@
         @(await Html.RenderComponentAsync<App>(RenderMode.Server))
     </app>
 
@@ -37,5 +36,6 @@
     <script src="_framework/blazor.server.js"></script>
 
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="~/js/site.js"></script>
 </body>
 </html>

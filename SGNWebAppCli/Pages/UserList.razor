@@ -1,0 +1,229 @@
+﻿@page "/userlist"
+@using Blazored.LocalStorage
+@inject IReportSerivce<User> reportSerivce
+@inject ILocalStorageService localStorageService
+@inject IUserService userSerivce
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="col-12">
+    <h3><b>Wprowadź dane użytkownika</b></h3>
+    <hr />
+
+    <ServerValidation IsVisible="IsVisible" Results="Result">
+        @RecordName
+    </ServerValidation>
+
+    <EditForm Model="@user" OnValidSubmit="@SaveUser">
+        <DataAnnotationsValidator />
+
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">imię :</label>
+            <input @ref="firstNameTextBox" class="form-control col-3" @bind="user.UserName" placeholder="imię" />
+            &nbsp;<ValidationMessage For="@(() => user.UserName)" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">nazwisko :</label>
+            <InputText class="form-control col-3" @bind-Value="user.UserLastName" placeholder="nazwisko" />
+            &nbsp;<ValidationMessage For="@(() => user.UserLastName)" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">email  :</label>
+            <InputText class="form-control col-3" @bind-Value="user.UserEmailAddress" placeholder="email" />
+            &nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">Aktywny :</label>
+            <InputCheckbox @bind-Value="user.IsActive" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <span class="col-2"></span>
+            <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
+            <span>&nbsp;</span>
+            @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
+        </div>
+    </EditForm>
+</div>
+<br />
+
+<div class="col-10">
+
+    <h3><b>Użytkownicy</b></h3>
+
+    @if (UsersList != null)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Email</th>
+                    <th>Aktywny</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in UsersList)
+                {
+                    string aktywny = @user.IsActive ? "Tak" : "Nie";
+                    <tr>
+                        <td>@user.IdUser</td>
+                        <td>@user.UserName</td>
+                        <td>@user.UserLastName</td>
+                        <td>
+                            <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
+                                @user.UserEmailAddress
+                            </NavLink>
+                        </td>
+                        <td>@aktywny</td>
+                        <td>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(()=>EditUser(user))">
+                                Edycja
+                            </a>
+                            <a>|</a>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(()=>DeleteUser(user.IdUser))">
+                                Usuń
+                            </a>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+    }
+
+
+</div>
+
+
+
+
+@code {
+    public User user { get; set; }
+    public List<User> UsersList { get; set; }
+    ElementReference firstNameTextBox;
+
+    public bool IsGridViewFiltered { get; set; }
+    public string RecordName { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    protected override void OnInitialized()
+    {
+      //  user = new User();
+        Console.WriteLine("User - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("User - OnInitializedAsync");
+
+        user = new User();
+        UsersList = new List<User>();
+
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("User - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("User - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("User - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("User - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadUsers();
+            StateHasChanged();
+        }
+    }
+    private async Task LoadUsers()
+    {
+        UsersList = await reportSerivce.GetAllAsync("users/GetUsers/");
+
+        if (UsersList == null)
+        {
+            RefreshRequest refreshRequest = new RefreshRequest();
+            refreshRequest.AccessToken = await localStorageService.GetItemAsync<string>("accessToken");
+            refreshRequest.RefreshToken = await localStorageService.GetItemAsync<string>("refreshToken");
+
+            var userHolder = await userSerivce.RefreshTokenAsync(refreshRequest);
+            await localStorageService.SetItemAsync("accessToken", userHolder.AccessToken);
+            UsersList = await reportSerivce.GetAllAsync("users/GetUsers/");
+        }
+        StateHasChanged();
+    }
+    private void EditUser(User argUser)
+    {
+        user = argUser;
+    }
+    
+    private async Task DeleteUser(int authorId)
+    {
+        await reportSerivce.DeleteAsync("users/DeleteUser/", authorId);
+        await LoadUsers();
+
+
+        //throw new Exception("DeleteAuthor");
+    }
+    public void Dispose()
+    {
+        Console.WriteLine("Users - Dispose");
+    }
+
+    private async Task SaveUser()
+    {
+
+
+        if (user.IdUser == 0)
+            await reportSerivce.SaveAsync("users/CreateUser/", user);
+        else
+            await reportSerivce.UpdateAsync("users/UpdateUser/", user.IdUser, user);
+
+        await LoadUsers();
+
+        Result = true;
+        IsVisible = true;
+
+        var firstName = user.UserName;
+        var lastName = user.UserLastName;
+
+        RecordName = firstName + " " + lastName;
+
+        user = new User();
+
+        // await JSRuntime.InvokeVoidAsync("saveMessage", firstName, lastName);
+        await JSRuntime.InvokeVoidAsync("setFocusOnElement", firstNameTextBox);
+    }
+
+
+}

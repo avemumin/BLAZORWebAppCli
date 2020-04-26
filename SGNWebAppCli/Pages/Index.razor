@@ -2,15 +2,13 @@
 
 <AuthorizeView>
     <Authorized>
-        <p>Witaj: @context.User.Identity.Name</p>
-
-
+        <p>Witaj, @context.User.Identity.Name</p>
         <InfoMainPage></InfoMainPage>
     </Authorized>
     <NotAuthorized>
-        <p>You are logged out!!</p>
+        <p>Zostałeś wylogowany!!</p>
     </NotAuthorized>
 </AuthorizeView>
 
-@*<InfoMainPage></InfoMainPage>*@
+
 
