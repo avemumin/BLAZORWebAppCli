@@ -16,10 +16,10 @@
 
     <EditForm Model="@user" OnValidSubmit="@SaveUser">
         <DataAnnotationsValidator />
-
+        @*@ref="firstNameTextBox"*@
         <div class="col-12 row">
             <label class="col-2 font-weight-bold">imię :</label>
-            <input @ref="firstNameTextBox" class="form-control col-3" @bind="user.UserName" placeholder="imię" />
+            <InputText class="form-control col-3" @bind-Value="user.UserName" placeholder="imię" />
             &nbsp;<ValidationMessage For="@(() => user.UserName)" />
         </div>
         <br />
@@ -114,9 +114,11 @@
     public string RecordName { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
+
+
     protected override void OnInitialized()
     {
-      //  user = new User();
+        user = new User();
         Console.WriteLine("User - OnInitialized");
         base.OnInitialized();
     }
@@ -186,12 +188,11 @@
     {
         user = argUser;
     }
-    
+
     private async Task DeleteUser(int authorId)
     {
         await reportSerivce.DeleteAsync("users/DeleteUser/", authorId);
         await LoadUsers();
-
 
         //throw new Exception("DeleteAuthor");
     }
@@ -199,7 +200,6 @@
     {
         Console.WriteLine("Users - Dispose");
     }
-
     private async Task SaveUser()
     {
 
@@ -219,10 +219,10 @@
 
         RecordName = firstName + " " + lastName;
 
-        user = new User();
-
         // await JSRuntime.InvokeVoidAsync("saveMessage", firstName, lastName);
-        await JSRuntime.InvokeVoidAsync("setFocusOnElement", firstNameTextBox);
+       // await JSRuntime.InvokeVoidAsync("setFocusOnElement", firstNameTextBox);
+
+        user = new User();
     }
 
 
