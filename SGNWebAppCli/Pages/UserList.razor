@@ -108,7 +108,7 @@
 @code {
     public User user { get; set; }
     public List<User> UsersList { get; set; }
-    ElementReference firstNameTextBox;
+    //  ElementReference firstNameTextBox;
 
     public bool IsGridViewFiltered { get; set; }
     public string RecordName { get; set; }
@@ -220,7 +220,7 @@
         RecordName = firstName + " " + lastName;
 
         // await JSRuntime.InvokeVoidAsync("saveMessage", firstName, lastName);
-       // await JSRuntime.InvokeVoidAsync("setFocusOnElement", firstNameTextBox);
+        // await JSRuntime.InvokeVoidAsync("setFocusOnElement", firstNameTextBox);
 
         user = new User();
     }

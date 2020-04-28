@@ -21,7 +21,7 @@ namespace SGNWebAppCli.Services
         {
             _appSettings = appSettings.Value;
             _localStorageService = localStorageService;
-            httpClient.Timeout = TimeSpan.FromMinutes(15);
+            //httpClient.Timeout = TimeSpan.FromMinutes(15);
             httpClient.BaseAddress = new Uri(_appSettings.ReportsStoresBaseAddress);
             httpClient.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
             _httpClient = httpClient;

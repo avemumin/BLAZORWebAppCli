@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SGNWebAppCli.Data;
+using SGNWebAppCli.Handlers;
 using SGNWebAppCli.Services;
 using System;
 using System.Net.Http;
@@ -32,6 +33,8 @@ namespace SGNWebAppCli
             var appSettingSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingSection);
 
+            services.AddTransient<ValidateHeaderHandler>();
+            services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddBlazoredLocalStorage();
 
             services.AddHttpClient<IReportSerivce<Currency>, ReportService<Currency>>();
@@ -40,12 +43,16 @@ namespace SGNWebAppCli
             services.AddHttpClient<IReportSerivce<QualityDetail>, ReportService<QualityDetail>>();
             services.AddHttpClient<IReportSerivce<Machine>, ReportService<Machine>>();
             services.AddHttpClient<IReportSerivce<QualityDetailAndMachine>, ReportService<QualityDetailAndMachine>>();
-            services.AddHttpClient<IReportSerivce<FileHistory>, ReportService<FileHistory>>();
+
+            services.AddHttpClient<IReportSerivce<FileHistory>, ReportService<FileHistory>>()
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
+
             services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>, ReportService<SerialNumbersDuplicates>>();
-            services.AddHttpClient<IReportSerivce<User>, ReportService<User>>();
+            services.AddHttpClient<IReportSerivce<User>, ReportService<User>>()
+                .AddHttpMessageHandler<ValidateHeaderHandler>(); 
 
             services.AddBlazoredSessionStorage();
-            services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
 
 
             services.AddHttpClient<IUserService, UserService>(config =>

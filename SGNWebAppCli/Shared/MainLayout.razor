@@ -1,20 +1,21 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <div class="sidebar">
-    <NavMenu/>
+    <NavMenu />
 </div>
 
 <div class="main">
     <div class="top-row px-4">
         <AuthorizeView>
             <Authorized>
+                <a style="color:forestgreen;font-style:oblique"> @context.User.Identity.Name </a>
                 <a href="/" @onclick="@(() => Logout())">Wyloguj</a>
             </Authorized>
             <NotAuthorized>
                 <a href="/">Loguj</a>
             </NotAuthorized>
         </AuthorizeView>
-        
+
         <a href="https://sygnity.pl" target="_blank">Info</a>
     </div>
 
@@ -26,6 +27,6 @@
 @code{
     public void Logout()
     {
-        (AuthenticationStateProvider as CustomAuthenticationStateProvider).MarkUserAsLoggedOut();
+        ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
     }
 }

@@ -1,13 +1,16 @@
 ﻿@page "/"
+@using Newtonsoft.Json
+@using SGNWebAppCli.Services
 @using SGNWebAppCli.Data
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
 @inject IUserService userService
 
 <EditForm Model="@user" OnValidSubmit="@ValidateUser">
     <div>
-        <h3 style="font-weight:bold; color:purple">Logowanie</h3>
+        <h3 style="font-weight:bold; color:Highlight">Logowanie</h3>
     </div>
     <div>
         <br />
@@ -17,7 +20,7 @@
     </div>
     <br />
     <div class="col-12 row">
-        <input class="form-control col-12" type="password" @bind="user.UserPassword" placeholder="hasło" />
+        <input class="form-control col-12" type="password" @bind="user.UserPassword" placeholder="hasło"  maxlength="20"/>
     </div>
     <div class="col-12 row">
         <span class="col-12"></span>
@@ -47,15 +50,23 @@
 
         if (returnedUser.UserEmailAddress != null)
         {
-            await sessionStorage.SetItemAsync("accessToken", returnedUser.AccessToken);
-            await sessionStorage.SetItemAsync("refreshToken", returnedUser.RefreshToken);
+
+            //await sessionStorage.SetItemAsync("accessToken", returnedUser.AccessToken);
+            //await sessionStorage.SetItemAsync("refreshToken", returnedUser.RefreshToken);
+            //await sessionStorage.SetItemAsync("emailAddress", user.UserEmailAddress);
+            await localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
+            await localStorageService.SetItemAsync("accessToken", returnedUser.AccessToken);
+            // await localStorageService.SetItemAsync("refreshToken", returnedUser.RefreshToken);
 
 
-            (AuthenticationStateProvider as CustomAuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
+
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
             NavigationManager.NavigateTo("/index");
+
         }
         else
         {
+            user.UserPassword = "";
             LoginMessage = "Niepoprawny login lub hasło";
         }
         return await Task.FromResult(true);

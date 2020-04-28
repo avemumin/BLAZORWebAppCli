@@ -23,7 +23,7 @@ namespace SGNWebAppCli.Data
             {
                  identity = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Email,emailAddress),
+                    new Claim(ClaimTypes.Name,emailAddress),
                 }, "apiauth_type");
             }
             else
@@ -49,7 +49,7 @@ namespace SGNWebAppCli.Data
 
         public void MarkUserAsLoggedOut()
         {
-
+            //_sessionStorageService.RemoveItemAsync("emailAddress");
             _sessionStorageService.RemoveItemAsync("accessToken");
             _sessionStorageService.RemoveItemAsync("refreshToken");
             var identity = new ClaimsIdentity();

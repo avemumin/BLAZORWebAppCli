@@ -3,49 +3,110 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject IUserService userService
+@implements IDisposable
 
-
-
-    <EditForm Model="@user" OnValidSubmit="@ValidateUser">
-        <div>
-            <h3 style="font-weight:bold; color:purple">Logowanie</h3>
-        </div>
-        <div>
-            <br />
-        </div>
-        <div class="col-12 row">
-            <input class="form-control col-12" @bind="user.UserEmailAddress" placeholder="email" />
-        </div>
+<EditForm  EditContext="@_editContext" OnValidSubmit="@RegisterUser">
+    <DataAnnotationsValidator />
+    <div>
+        <h3 style="font-weight:bold; color:purple">Rejestracja</h3>
+    </div>
+    <div>
         <br />
-        <div class="col-12 row">
-            <input class="form-control col-12" type="password" @bind="user.UserPassword" placeholder="utwórz hasło" />
-        </div>
+    </div>
+    <div class="col-12 row">
+        <InputText class="form-control col-12"
+                   @bind-Value="_userEditCntx.UserName" placeholder="imię" />
+        &nbsp;<ValidationMessage For="@(() => _userEditCntx.UserName)" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <InputText class="form-control col-12"
+                   @bind-Value="_userEditCntx.UserLastName" placeholder="nazwisko" />
+        &nbsp;<ValidationMessage For="@(() => _userEditCntx.UserLastName)" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <InputText class="form-control col-12" 
+                   @bind-Value="_userEditCntx.UserEmailAddress" placeholder="email" />
+        &nbsp;<ValidationMessage For="@(() => _userEditCntx.UserEmailAddress)" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <InputText class="form-control col-12" 
+                   @bind-Value="_userEditCntx.ConfirmEmailAddress" placeholder="powtórz email" />
+        &nbsp;<ValidationMessage For="@(() => _userEditCntx.ConfirmEmailAddress)" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <InputText class="form-control col-12" type="password" 
+                   @bind-Value="_userEditCntx.UserPassword" placeholder="hasło  min. 8 znaków mała duża litera cyfra znak speclajny" />
+        &nbsp;<ValidationMessage For="@(() => _userEditCntx.UserPassword)" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <InputText class="form-control col-12" type="password" 
+                   @bind-Value="_userEditCntx.ConfirmPassword" placeholder="powtórz hasło" />
+        &nbsp;<ValidationMessage For="@(() => _userEditCntx.ConfirmPassword)" />
+    </div>
+    <div class="col-12 row">
+        <span class="col-12"></span>
         <br />
-        <div class="col-12 row">
-            <input class="form-control col-12" type="password" @bind="user.ConfirmPassword" placeholder="powtórz hasło" />
-        </div>
-        <div class="col-12 row">
-            <span class="col-12"></span>
-            <br />
-            <input type="submit" class="form-control col-6 btn btn-primary" value="Rejestruj" />
-            <a href="/" class="col-4">Wróć</a>
-        </div>
-    </EditForm>
+        <input type="submit" class="form-control col-6 btn btn-primary" value="Rejestruj" />
+        <a href="/" class="col-4">Wróć</a>
+    </div>
+</EditForm>
 
 
 @code {
+    private EditContext _editContext;
+    private User _userEditCntx = new User();
+    private bool _formInvalid = true;
+
     private User user;
+    public string LoginMessage { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_userEditCntx);
+        _editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
     protected override Task OnInitializedAsync()
     {
         user = new User();
         return base.OnInitializedAsync();
     }
-    private async Task<bool> ValidateUser()
+    private async Task<bool> RegisterUser()
     {
-        (AuthenticationStateProvider as CustomAuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
-        NavigationManager.NavigateTo("/index");
+        user = _userEditCntx;
+        user.IsActive = false;
+        user.LastEditDate = DateTime.Now;
+        var returnedUser = await userService.RegisterUserAsync(user);
 
-        await sessionStorage.SetItemAsync("emailAddress", user.UserEmailAddress);
+        if (returnedUser.UserEmailAddress != null)
+        {
+            //await localStorageService.SetItemAsync("emailAddress", user.UserEmailAddress);
+            await localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
+            await localStorageService.SetItemAsync("accessToken", returnedUser.AccessToken);
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
+            NavigationManager.NavigateTo("/index");
+        }
+        // await sessionStorage.SetItemAsync("emailAddress", user.UserEmailAddress);
         return await Task.FromResult(true);
     }
+   
+    
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        _formInvalid = !_editContext.Validate();
+        StateHasChanged();
+        
+    }
+    public void Dispose()
+    {
+        _editContext.OnFieldChanged -= HandleFieldChanged;
+    }
+
 }

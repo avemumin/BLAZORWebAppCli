@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SGNWebAppCli.Data;
+using SGNWebAppCli.Helpers;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace SGNWebAppCli.Services
 
         public async Task<User> LoginAsync(User user)
         {
+            user.UserPassword = Utility.Encrypt(user.UserPassword);
             string serializedUser = JsonConvert.SerializeObject(user);
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "Login");
@@ -37,7 +39,7 @@ namespace SGNWebAppCli.Services
         {
             string serializedUser = JsonConvert.SerializeObject(refreshRequest);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "Users/RefreshToken");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "RefreshToken");
             requestMessage.Content = new StringContent(serializedUser);
 
             requestMessage.Content.Headers.ContentType
@@ -53,5 +55,25 @@ namespace SGNWebAppCli.Services
             return await Task.FromResult(returnedUser);
         }
 
+        public async Task<User> RegisterUserAsync(User user)
+        {
+            user.UserPassword = Utility.Encrypt(user.UserPassword);
+            string serializedUser = JsonConvert.SerializeObject(user);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "RegisterUser");
+            requestMessage.Content = new StringContent(serializedUser);
+
+            requestMessage.Content.Headers.ContentType
+                = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var responseStatusCode = response.StatusCode;
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            var returnedUser = JsonConvert.DeserializeObject<User>(responseBody);
+
+            return await Task.FromResult(returnedUser);
+        }
     }
 }
