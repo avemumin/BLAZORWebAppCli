@@ -35,7 +35,7 @@ namespace SGNWebAppCli.Data
 
 
 
-        [Required(ErrorMessage = "Pole wymagane!!")]
+        [Required(ErrorMessage = "Hasło jest wymagane!!")]
         [MaxLength(20)]
         [DataType(DataType.Password)]
         [NotMapped]
@@ -44,12 +44,12 @@ namespace SGNWebAppCli.Data
 
 
 
-        [Required(ErrorMessage = "Pole wymagane!!")]
+        //[Required(ErrorMessage = "Pole wymagane!!")]
         [Compare("UserPassword",ErrorMessage ="Hasła nie są takie same")]
         [DataType(DataType.Password)]
         [NotMapped]
         [MaxLength(20)]
-        [RegularExpression(@"^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!*@#$%^&+=]).*$", ErrorMessage = "Hasło nie spełnia wymagań")]
+//        [RegularExpression(@"^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!*@#$%^&+=]).*$", ErrorMessage = "Hasło nie spełnia wymagań")]
         public string ConfirmPassword { get; set; }
 
 
