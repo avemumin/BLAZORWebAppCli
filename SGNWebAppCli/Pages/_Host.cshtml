@@ -20,6 +20,7 @@
 <body>
     <app>
         @(await Html.RenderComponentAsync<App>(RenderMode.Server))
+        @*Ważna sprawa wymuesznie RenderMode jako serwer dla komponentu musi być gdy wywoływany jest java script inaczej sie zdupczy... *@
         @*<component type="typeof(App)" render-mode="ServerPrerendered" />*@
     </app>
 

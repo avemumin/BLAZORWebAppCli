@@ -1,16 +1,16 @@
 ﻿@page "/repfilehist"
 @inject IReportSerivce<FileHistory> reportService
-
+@implements IDisposable
 @*@if (rfhList == null)
-{
-    <LoadingData DisplayMessage="false"></LoadingData>
-}
-else if (rfhList.Count == 0)
-{
-    <text> Brak danych do wyświetlenia </text>
-}
-else
-{ }*@
+    {
+        <LoadingData DisplayMessage="false"></LoadingData>
+    }
+    else if (rfhList.Count == 0)
+    {
+        <text> Brak danych do wyświetlenia </text>
+    }
+    else
+    { }*@
 @if (rfhList != null)
 {
     <GridView Items="rfhList">
@@ -52,5 +52,9 @@ else
     {
         rfhList = await reportService.GetAllAsync("ReportFilesHistory/");
         StateHasChanged();
+    }
+    public void Dispose()
+    {
+        Console.WriteLine("Heport File History - Dispose");
     }
 }

@@ -5,6 +5,8 @@
 @inject IReportSerivce<Mode> dictionaryModeService
 @inject IReportSerivce<Quality> dictionaryQualityService
 
+@implements IDisposable
+
 @if (displayFilters == true)
 {
     <p style="font-size:16px;text-align:center"><b>Raport jakościowy</b></p>
@@ -289,6 +291,13 @@ else
         QualityPropertyKey = strqd.ToString();
 
         StateHasChanged();
+    }
+    #endregion
+
+    #region Dispose
+    public void Dispose()
+    {
+        Console.WriteLine("Quality Report - Dispose");
     }
     #endregion
 }

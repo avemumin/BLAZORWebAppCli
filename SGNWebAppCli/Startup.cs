@@ -1,5 +1,4 @@
 using Blazored.LocalStorage;
-using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -51,7 +50,7 @@ namespace SGNWebAppCli
             services.AddHttpClient<IReportSerivce<User>, ReportService<User>>()
                 .AddHttpMessageHandler<ValidateHeaderHandler>(); 
 
-            services.AddBlazoredSessionStorage();
+            //services.AddBlazoredSessionStorage();
 
 
 

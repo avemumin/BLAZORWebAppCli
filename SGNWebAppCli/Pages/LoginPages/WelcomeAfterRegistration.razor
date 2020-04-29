@@ -1,0 +1,25 @@
+﻿@page  "/afterCreateAccountInformation"
+@inject NavigationManager GoToPage
+@implements IDisposable
+<div>
+    <div>
+        <p class="alert alert-success">
+            Twoje konto zostało utworzone.
+            <br />
+            Skontaktuj się z administratorem celem jego aktywacji
+        </p>
+        <br />
+        <input type="submit" class="form-control col-6 btn btn-primary"  @onclick="@GoToLoginPage" value="Rozumiem" />
+    </div>
+</div>
+
+@code {
+    private void GoToLoginPage()
+    {
+        GoToPage.NavigateTo("/");
+    }
+    public void Dispose()
+    {
+        Console.WriteLine("Info after registration - Dispose");
+    }
+}

@@ -6,6 +6,8 @@
 @inject IReportSerivce<Quality> dictionaryQualityService
 @inject IReportSerivce<Machine> machineService
 
+@implements IDisposable
+
 @if (displayFilters == true)
 {
     <p style="font-size:16px;text-align:center"><b>Raport jakościowy z podziałem na urządzenia</b></p>
@@ -86,7 +88,7 @@
         </div>
         <div class="row">
             <div class="border">
-                @if (DisplayError == true )
+                @if (DisplayError == true)
                 {
                     <div style="align-content:center;width:auto">
                         <div style="align-content:center;width:620px ">
@@ -193,6 +195,7 @@
 
 @code {
 
+    #region properties and collections
     Machine machine = new Machine();
     //detail view
     List<QualityDetailAndMachine> QualityMachinesList { get; set; }
@@ -200,7 +203,7 @@
     private IEnumerable<Machine> MachinesCollection;
 
 
-    #region properties and collections
+
     private bool IsSearchExecuted { get; set; } = false;
 
     private bool AfterExecuted { get; set; } = false;
@@ -378,6 +381,13 @@
                 newMachineList.Add(machine);
         }
         return await Task.FromResult(newMachineList);
+    }
+    #endregion
+
+    #region Dispose
+    public void Dispose()
+    {
+        Console.WriteLine("QualityAndMachine report - Dispose");
     }
     #endregion
 }

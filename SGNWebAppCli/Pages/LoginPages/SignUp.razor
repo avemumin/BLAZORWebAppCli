@@ -2,7 +2,7 @@
 @using SGNWebAppCli.Data
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@*@inject Blazored.SessionStorage.ISessionStorageService sessionStorage*@
 @inject Blazored.LocalStorage.ILocalStorageService localStorageService
 @inject IUserService userService
 @implements IDisposable
@@ -89,13 +89,11 @@
 
         if (returnedUser.UserEmailAddress != null)
         {
-            //await localStorageService.SetItemAsync("emailAddress", user.UserEmailAddress);
             await localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
             await localStorageService.SetItemAsync("accessToken", returnedUser.AccessToken);
             ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
-            NavigationManager.NavigateTo("/index");
+            NavigationManager.NavigateTo("/afterCreateAccountInformation");
         }
-        // await sessionStorage.SetItemAsync("emailAddress", user.UserEmailAddress);
         return await Task.FromResult(true);
     }
    

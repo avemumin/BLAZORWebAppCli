@@ -1,4 +1,4 @@
-﻿using Blazored.SessionStorage;
+﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -7,31 +7,33 @@ namespace SGNWebAppCli.Data
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private ISessionStorageService _sessionStorageService;
-        public CustomAuthenticationStateProvider(ISessionStorageService sessionStorageService)
+        // Zmiana z sessionstorage na local
+        // private ISessionStorageService _sessionStorageService;
+        private ILocalStorageService _localStorageService;
+        public CustomAuthenticationStateProvider(ILocalStorageService localStorageService)
         {
-            _sessionStorageService = sessionStorageService;
+            _localStorageService = localStorageService;
         }
 
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
 
-            var emailAddress = await _sessionStorageService.GetItemAsync<string>("emailAddress");
+            var emailAddress = await _localStorageService.GetItemAsync<string>("emailAddress");
             ClaimsIdentity identity;
             if (emailAddress != null)
             {
-                 identity = new ClaimsIdentity(new[]
-                {
+                identity = new ClaimsIdentity(new[]
+               {
                     new Claim(ClaimTypes.Name,emailAddress),
                 }, "apiauth_type");
             }
             else
             {
-                 identity = new ClaimsIdentity();
+                identity = new ClaimsIdentity();
             }
 
-            
+
             var user = new ClaimsPrincipal(identity);
             return await Task.FromResult(new AuthenticationState(user));
         }
@@ -42,16 +44,15 @@ namespace SGNWebAppCli.Data
            {
                 new Claim(ClaimTypes.Name,emailAddress),
             }, "apiauth_type");
-            
+
             var user = new ClaimsPrincipal(identity);
-            NotifyAuthenticationStateChanged( Task.FromResult(new AuthenticationState(user)));
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
 
         public void MarkUserAsLoggedOut()
         {
-            //_sessionStorageService.RemoveItemAsync("emailAddress");
-            _sessionStorageService.RemoveItemAsync("accessToken");
-            _sessionStorageService.RemoveItemAsync("refreshToken");
+            _localStorageService.RemoveItemAsync("accessToken");
+            _localStorageService.RemoveItemAsync("refreshToken");
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
 

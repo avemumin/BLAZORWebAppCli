@@ -70,9 +70,9 @@ namespace SGNWebAppCli.Services
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri + Id);
 
-            //var token = await _localStorageService.GetItemAsync<string>("accessToken");
-            //requestMessage.Headers.Authorization
-            //    = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var token = await _localStorageService.GetItemAsync<string>("accessToken");
+            requestMessage.Headers.Authorization
+                = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await _httpClient.SendAsync(requestMessage);
 
