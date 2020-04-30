@@ -36,6 +36,8 @@ namespace SGNWebAppCli
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddBlazoredLocalStorage();
 
+            services.AddHttpClient<IUserService, UserService>();
+
             services.AddHttpClient<IReportSerivce<Currency>, ReportService<Currency>>();
             services.AddHttpClient<IReportSerivce<Mode>, ReportService<Mode>>();
             services.AddHttpClient<IReportSerivce<Quality>, ReportService<Quality>>();
@@ -54,11 +56,11 @@ namespace SGNWebAppCli
 
 
 
-            services.AddHttpClient<IUserService, UserService>(config =>
-              {
-                  config.BaseAddress = new Uri("https://localhost:44398/api/Users/");
-                  config.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
-              });
+            //services.AddHttpClient<IUserService, UserService>(config =>
+            //  {
+            //      config.BaseAddress = new Uri("https://localhost:44398/api/Users/");
+            //      config.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
+            //  });
             services.AddSingleton<HttpClient>();
         }
 

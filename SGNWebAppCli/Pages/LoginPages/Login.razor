@@ -4,8 +4,6 @@
 @using SGNWebAppCli.Data
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@*@inject Blazored.SessionStorage.ISessionStorageService sessionStorage*@
-@inject Blazored.LocalStorage.ILocalStorageService localStorageService
 @inject IUserService userService
 @implements IDisposable
 <EditForm Model="@user" OnValidSubmit="@ValidateUser">
@@ -51,12 +49,8 @@
 
         if (returnedUser.UserEmailAddress != null)
         {
-                await localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
-                await localStorageService.SetItemAsync("accessToken", returnedUser.AccessToken);
-               
-                ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
-                NavigationManager.NavigateTo("/index");
-
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
+            NavigationManager.NavigateTo("/index");
         }
         else
         {

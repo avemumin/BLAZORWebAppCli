@@ -2,8 +2,6 @@
 @using SGNWebAppCli.Data
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@*@inject Blazored.SessionStorage.ISessionStorageService sessionStorage*@
-@inject Blazored.LocalStorage.ILocalStorageService localStorageService
 @inject IUserService userService
 @implements IDisposable
 
@@ -89,20 +87,18 @@
 
         if (returnedUser.UserEmailAddress != null)
         {
-            await localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
-            await localStorageService.SetItemAsync("accessToken", returnedUser.AccessToken);
-            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user.UserEmailAddress);
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
             NavigationManager.NavigateTo("/afterCreateAccountInformation");
         }
         return await Task.FromResult(true);
     }
-   
-    
+
+
     private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
     {
         _formInvalid = !_editContext.Validate();
         StateHasChanged();
-        
+
     }
     public void Dispose()
     {

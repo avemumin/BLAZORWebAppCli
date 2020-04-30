@@ -7,7 +7,7 @@ namespace SGNWebAppCli.Services
     {
         public Task<User> LoginAsync(User user);
         public Task<User> RefreshTokenAsync(RefreshRequest refreshRequest);
-
+        public Task<User> GetUserByAccessTokenAsync(string accessToken);
         public Task<User> RegisterUserAsync(User user);
     }
 }
