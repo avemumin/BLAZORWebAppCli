@@ -24,28 +24,20 @@ namespace SGNWebAppCli.Data
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-
-            // var emailAddress = await _localStorageService.GetItemAsync<string>("emailAddress");
             var accessToken = await _localStorageService.GetItemAsync<string>("accessToken");
             ClaimsIdentity identity;
-            // if (emailAddress != null)
-            if (string.IsNullOrEmpty(accessToken))
+         
+            if (!string.IsNullOrEmpty(accessToken))
             {
                 User user = await _userService.GetUserByAccessTokenAsync(accessToken);
               
                 identity = GetClaimsIdentity(user);
-                // identity = new ClaimsIdentity(new[]
-                //{
-                //     new Claim(ClaimTypes.Name,emailAddress),
-                // }, "apiauth_type");
             }
             else
             {
                 identity = new ClaimsIdentity();
             }
 
-
-            // var user = new ClaimsPrincipal(identity);
             var claimsPrincipal = new ClaimsPrincipal(identity);
             return await Task.FromResult(new AuthenticationState(claimsPrincipal));
         }
@@ -54,12 +46,9 @@ namespace SGNWebAppCli.Data
         {
             await _localStorageService.SetItemAsync("accessToken", user.AccessToken);
             await _localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
-            var identity = GetClaimsIdentity(user);
-            // var identity = new ClaimsIdentity(new[]
-            //{
-            //     new Claim(ClaimTypes.Name,emailAddress),
-            // }, "apiauth_type");
 
+            var identity = GetClaimsIdentity(user);
+      
             var claimsPrincipal = new ClaimsPrincipal(identity);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
@@ -68,6 +57,7 @@ namespace SGNWebAppCli.Data
         {
             _localStorageService.RemoveItemAsync("accessToken");
             _localStorageService.RemoveItemAsync("refreshToken");
+
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
 
