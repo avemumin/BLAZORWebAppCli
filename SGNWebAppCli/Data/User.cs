@@ -60,18 +60,18 @@ namespace SGNWebAppCli.Data
         [DefaultValue(false)]
         public bool IsActive { get; set; }
         public DateTime? LastEditDate { get; set; }
-        public byte Role { get; set; }
-
+        public byte RoleId { get; set; }
+        public Role Role { get; set; }
 
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
 
     
 
-        public User()
-        {
+        //public User()
+        //{
 
-        }
+        //}
        
     }
 }

@@ -14,23 +14,25 @@ namespace SGNWebAppCli.Data
         private ILocalStorageService _localStorageService;
         public IUserService _userService;
         private readonly HttpClient _httpClient;
-        public CustomAuthenticationStateProvider(ILocalStorageService localStorageService,IUserService userService)
+        public CustomAuthenticationStateProvider(ILocalStorageService localStorageService, IUserService userService,HttpClient httpClient)
         {
             _localStorageService = localStorageService;
             _userService = userService;
+            _httpClient = httpClient;
         }
 
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
 
-            //var emailAddress = await _localStorageService.GetItemAsync<string>("emailAddress");
+            // var emailAddress = await _localStorageService.GetItemAsync<string>("emailAddress");
             var accessToken = await _localStorageService.GetItemAsync<string>("accessToken");
             ClaimsIdentity identity;
             // if (emailAddress != null)
-            if (!string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(accessToken))
             {
                 User user = await _userService.GetUserByAccessTokenAsync(accessToken);
+              
                 identity = GetClaimsIdentity(user);
                 // identity = new ClaimsIdentity(new[]
                 //{
@@ -76,10 +78,17 @@ namespace SGNWebAppCli.Data
         {
             var claimsIdentity = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, user.UserEmailAddress)
+                new Claim(ClaimTypes.Name, user.UserEmailAddress),
+                new Claim(ClaimTypes.Role, user.Role.RoleDescription),
+                new Claim("IsActiveUser",CheckActive(user))
             }, "apiauth_type");
 
             return claimsIdentity;
+        }
+
+        private string CheckActive(User user)
+        {
+            return user.IsActive == true ? "true" : "false";
         }
     }
 }

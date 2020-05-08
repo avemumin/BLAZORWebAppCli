@@ -2,10 +2,11 @@
 @using Newtonsoft.Json
 @using SGNWebAppCli.Services
 @using SGNWebAppCli.Data
+@using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IUserService userService
-@implements IDisposable
+
 <EditForm Model="@user" OnValidSubmit="@ValidateUser">
     <div>
         <h3 style="font-weight:bold; color:Highlight">Logowanie</h3>
@@ -36,10 +37,19 @@
 @code {
     private User user;
     public string LoginMessage { get; set; } = String.Empty;
-    protected override Task OnInitializedAsync()
+
+    ClaimsPrincipal claimsPrincipal;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    protected async override Task OnInitializedAsync()
     {
         user = new User();
-        return base.OnInitializedAsync();
+
+        claimsPrincipal = (await authenticationStateTask).User;
+        if (claimsPrincipal.Identity.IsAuthenticated)
+            NavigationManager.NavigateTo("/index");
+
     }
 
     private async Task<bool> ValidateUser()
@@ -61,8 +71,8 @@
         return await Task.FromResult(true);
     }
 
-    public void Dispose()
-    {
-        Console.WriteLine("Login page - Disposed");
-    }
+    //public void Dispose()
+    //{
+    //    Console.WriteLine("Login page - Disposed");
+    //}
 }

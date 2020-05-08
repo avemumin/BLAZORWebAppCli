@@ -50,17 +50,18 @@ namespace SGNWebAppCli
 
             services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>, ReportService<SerialNumbersDuplicates>>();
             services.AddHttpClient<IReportSerivce<User>, ReportService<User>>()
-                .AddHttpMessageHandler<ValidateHeaderHandler>(); 
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
 
-            //services.AddBlazoredSessionStorage();
+        
 
+            services.AddAuthorization(option =>
+               {
+                   option.AddPolicy("ActiveUser", policy =>
+                   policy.RequireClaim("IsActiveUser", "true"));
+               }
+                );
 
-
-            //services.AddHttpClient<IUserService, UserService>(config =>
-            //  {
-            //      config.BaseAddress = new Uri("https://localhost:44398/api/Users/");
-            //      config.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
-            //  });
+      
             services.AddSingleton<HttpClient>();
         }
 
