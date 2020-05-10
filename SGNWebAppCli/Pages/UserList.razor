@@ -64,34 +64,56 @@
                     <th>Nazwisko</th>
                     <th>Email</th>
                     <th>Aktywny</th>
+                    <AuthorizeView Roles="owner">
+                        <Authorized>
+                            <th>Dostępne akcje</th>
+                        </Authorized>
+                    </AuthorizeView>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var user in UsersList)
                 {
                     string aktywny = @user.IsActive ? "Tak" : "Nie";
-                    <tr>
-                        <td>@user.IdUser</td>
-                        <td>@user.UserName</td>
-                        <td>@user.UserLastName</td>
-                        <td>
-                            <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
-                                @user.UserEmailAddress
-                            </NavLink>
-                        </td>
-                        <td>@aktywny</td>
-                        <td>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                               @onclick="(()=>EditUser(user))">
-                                Edycja
-                            </a>
-                            <a>|</a>
-                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                               @onclick="(()=>DeleteUser(user.IdUser))">
-                                Usuń
-                            </a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>@user.IdUser</td>
+                    <td>@user.UserName</td>
+                    <td>@user.UserLastName</td>
+                    <td>
+                        <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
+                            @user.UserEmailAddress
+                        </NavLink>
+                    </td>
+                    <td>@aktywny</td>
+
+                    @*<td>
+                        <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                           @onclick="(()=>EditUser(user))">
+                            Edycja
+                        </a>
+                        <a>|</a>
+                        <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                           @onclick="(()=>DeleteUser(user.IdUser))">
+                            Usuń
+                        </a>
+                    </td>*@
+
+                    <AuthorizeView Roles="owner">
+                        <Authorized>
+                            <th>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                   @onclick="(()=>EditUser(user))">
+                                    Edycja
+                                </a>
+                                <a>|</a>
+                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                   @onclick="(()=>DeleteUser(user.IdUser))">
+                                    Usuń
+                                </a>
+                            </th>
+                        </Authorized>
+                    </AuthorizeView>
+                </tr>
                 }
 
             </tbody>
@@ -193,7 +215,8 @@
     {
         await reportSerivce.DeleteAsync("users/DeleteUser/", authorId);
         await LoadUsers();
-
+        Result = true;
+        IsVisible = true;
         //throw new Exception("DeleteAuthor");
     }
     public void Dispose()

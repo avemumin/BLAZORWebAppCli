@@ -1,0 +1,89 @@
+﻿
+@using System.Globalization
+@using System.IO
+@using CsvHelper
+@inject IJSRuntime JS
+@typeparam TItem
+
+@if (ButtonVisibility)
+{
+    <br />
+    <div class="col-3">
+        <button type="button" class="btn btn-success" @onclick="@(() => DisplayQuestion = !DisplayQuestion)">@ExecutionTitleHeader</button>
+
+    </div>
+    <Confirmation @ref="confirmation"
+                  DisplayConfirmation="DisplayQuestion"
+                  onCancel="onCancel"
+                  onSave="onConfirm"
+                  UserDeclaredFileName="@FileName"
+                  Title="Czy chcesz zapisać dane do pliku ?">
+        <div>
+            <input class="form-control" type="text" placeholder="podaj nazwę pliku (opcjonalne)" @bind="@UserFileName" style="width:250px;height:25px" />
+        </div>
+    </Confirmation>
+}
+@code {
+    [Parameter] public bool ButtonVisibility { get; set; } = false;
+    [Parameter] public string ExecutionTitleHeader { get; set; }
+    [Parameter] public List<TItem> ExportedCollectionName { get; set; }
+    [Parameter] public string DefaultFileName { get; set; }
+    [Parameter] public EventCallback onClicked { get; set; }
+
+    public string UserFileName { get; set; } = String.Empty;
+    public string Type { get; set; }
+    private bool IsCsv { get; set; } = true;
+    public bool DisplayQuestion { get; set; } = false;
+    Confirmation confirmation;
+
+
+
+    void onCancel()
+    {
+        DisplayQuestion = false;
+
+        confirmation.Hide();
+    }
+
+    void onConfirm()
+    {
+        DisplayQuestion = false;
+        confirmation.Hide();
+        ExportToCsv();
+        UserFileName = string.Empty;
+    }
+    private string FileExtension
+    {
+        get => IsCsv ? ".csv" : ".pdf";
+    }
+
+    private string FileName
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(UserFileName))
+                return DefaultFileName + " " + DateTime.Now;
+            return UserFileName;
+        }
+    }
+
+    public async void ExportToCsv()
+    {
+        if (!ExtensionMethods.IsCollectionEmptyOrNull(ExportedCollectionName))
+            return;
+        using (var memoryStream = new MemoryStream())
+        {
+            using (var writer = new StreamWriter(memoryStream))
+            {
+                using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
+                {
+                    csv.WriteRecords(ExportedCollectionName);
+                }
+                var arr = memoryStream.ToArray();
+                await JS.ToCsVFile(string.Concat(FileName, FileExtension), arr);
+            }
+        }
+    }
+
+
+}
