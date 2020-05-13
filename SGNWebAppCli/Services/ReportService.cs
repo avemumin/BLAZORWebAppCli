@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Utilities;
 using SGNWebAppCli.Data;
 using System;
 using System.Collections.Generic;
@@ -44,25 +45,38 @@ namespace SGNWebAppCli.Services
         }
 
         //Get all
-        public async Task<List<T>> GetAllAsync(string requestUri)
+        public async Task<List<T>> GetAllAsync(string requestUri, bool isSpecialMode = false)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
-            
+
 
             var token = await _localStorageService.GetItemAsync<string>("accessToken");
             requestMessage.Headers.Authorization
                 = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            var response = await _httpClient.SendAsync(requestMessage);
-
-            var responseStatusCode = response.StatusCode;
-            if (responseStatusCode.ToString() == "OK")
+            try
             {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                return await Task.FromResult(JsonConvert.DeserializeObject<List<T>>(responseBody));
+                //only for Duplicates Report changed Timeout value from 1m40s to 20 min
+                _httpClient.Timeout = isSpecialMode ? TimeSpan.FromMinutes(20) : TimeSpan.FromSeconds(100);
+
+
+                var response = await _httpClient.SendAsync(requestMessage);
+
+
+                var responseStatusCode = response.StatusCode;
+                if (responseStatusCode.ToString() == "OK")
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    return await Task.FromResult(JsonConvert.DeserializeObject<List<T>>(responseBody));
+                }
+                else
+                    return null;
             }
-            else
-                return null;
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+
         }
 
         //Get by id

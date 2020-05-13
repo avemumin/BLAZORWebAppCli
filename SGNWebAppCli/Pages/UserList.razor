@@ -87,7 +87,12 @@
                                     </NavLink>
                                 </Authorized>
                             </AuthorizeView>
-                            
+                            <AuthorizeView Roles="Nowy-Użytkownik">
+                                <Authorized>
+                                    <a>@user.UserEmailAddress</a>
+                                </Authorized>
+                            </AuthorizeView>
+
                         </td>
                         <td>@aktywny</td>
 
@@ -126,8 +131,8 @@
 
 
 @code {
-   
-     
+
+
     public User user { get; set; }
     public List<User> UsersList { get; set; }
     //  ElementReference firstNameTextBox;
@@ -136,7 +141,7 @@
     public string RecordName { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
-   
+    public AuthenticationState MyProperty { get; set; }
 
     protected override void OnInitialized()
     {
@@ -213,6 +218,7 @@
 
     private async Task DeleteUser(int authorId)
     {
+
         await reportSerivce.DeleteAsync("users/DeleteUser/", authorId);
         await LoadUsers();
         Result = true;

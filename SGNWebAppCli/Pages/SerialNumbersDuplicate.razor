@@ -118,7 +118,7 @@ else
         try
         {
             DuplicatesList = new List<SerialNumbersDuplicates>();
-            dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currency/DictionaryCurrency");
+            dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currencies/");
             dictionaryCurrenciesId = dictionaryCurrencies.Select(x => x.IdCurrency);
             CurrencyPropertyKey = string.Join(",", (IEnumerable<short>)dictionaryCurrenciesId);
             StartDate = DateTime.Now.AddDays(-3);
@@ -149,7 +149,7 @@ else
 
             IsSearchExecuted = true;
             //await Task.Delay(2000);
-            DuplicatesList = await reportService.GetAllAsync($"SerialNumbersDuplicates/GetByDate/{CurrencyPropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
+            DuplicatesList = await reportService.GetAllAsync($"SerialNumbersDuplicates/{CurrencyPropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}",true);
             IsSearchExecuted = false;
             AfterExecuted = true;
             StateHasChanged();

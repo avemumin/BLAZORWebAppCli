@@ -59,8 +59,16 @@
 
         if (returnedUser.UserEmailAddress != null)
         {
-            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
-            NavigationManager.NavigateTo("/index");
+            if (returnedUser.IsActive)
+            {
+                ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
+                NavigationManager.NavigateTo("/index");
+            }
+            else
+            {
+                user.UserPassword = "";
+                LoginMessage = "Użytkonik nie jest aktywowany idź do administratora";
+            }
         }
         else
         {

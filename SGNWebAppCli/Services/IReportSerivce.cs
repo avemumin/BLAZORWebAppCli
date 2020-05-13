@@ -5,7 +5,7 @@ namespace SGNWebAppCli.Services
 {
     interface IReportSerivce<T>
     {
-        Task<List<T>> GetAllAsync(string requestUri);
+        Task<List<T>> GetAllAsync(string requestUri,bool isSpecialMode=false);
 
 
         Task<T> GetByIdAsync(string requestUri, int Id);
