@@ -1,5 +1,5 @@
 ﻿@page "/index"
-
+@attribute [Authorize(Policy = "ActiveUser")]
 <AuthorizeView>
     <Authorized>
         <p>Witaj, @context.User.Identity.Name</p>

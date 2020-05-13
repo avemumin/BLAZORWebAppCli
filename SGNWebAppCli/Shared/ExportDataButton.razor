@@ -19,7 +19,15 @@
                   UserDeclaredFileName="@FileName"
                   Title="Czy chcesz zapisać dane do pliku ?">
         <div>
-            <input class="form-control" type="text" placeholder="podaj nazwę pliku (opcjonalne)" @bind="@UserFileName" style="width:250px;height:25px" />
+            <input class="form-control" type="text" placeholder="podaj nazwę pliku (opcjonalne)" @bind="@ExportedFileName" style="width:250px;height:25px" />
+            <RadzenRadioButtonList @bind-Value="IsCsv"
+                                   TValue="int"
+                                   Change="@((args) => Change(args, "zmieniono"))">
+                <Items>
+                    <RadzenRadioButtonListItem Text="csv" Value="1" />
+                    <RadzenRadioButtonListItem Text="pdf" Value="2" />
+                </Items>
+            </RadzenRadioButtonList>
         </div>
     </Confirmation>
 }
@@ -30,9 +38,12 @@
     [Parameter] public string DefaultFileName { get; set; }
     [Parameter] public EventCallback onClicked { get; set; }
 
-    public string UserFileName { get; set; } = String.Empty;
-    public string Type { get; set; }
-    private bool IsCsv { get; set; } = true;
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    public string ExportedFileName { get; set; } = String.Empty;
+    //public string Type { get; set; }
+    private int IsCsv { get; set; } = 1;
     public bool DisplayQuestion { get; set; } = false;
     Confirmation confirmation;
 
@@ -49,25 +60,62 @@
     {
         DisplayQuestion = false;
         confirmation.Hide();
-        ExportToCsv();
-        UserFileName = string.Empty;
+        ExecuteExport();
+        ExportedFileName = string.Empty;
     }
     private string FileExtension
     {
-        get => IsCsv ? ".csv" : ".pdf";
+        get => IsCsv.Equals(1) ? ".csv" : ".pdf";
     }
 
+
+    private void ExecuteExport()
+    {
+        switch (IsCsv)
+        {
+            case 1:
+                ExportToCsv();
+                break;
+            case 2:
+                ExportToPdf();
+                break;
+            default:
+                break;
+        }
+    }
     private string FileName
     {
         get
         {
-            if (string.IsNullOrEmpty(UserFileName))
+            if (string.IsNullOrEmpty(ExportedFileName))
                 return DefaultFileName + " " + DateTime.Now;
-            return UserFileName;
+            return ExportedFileName;
         }
     }
 
-    public async void ExportToCsv()
+ 
+
+
+    void Change(int? value, string name)
+    {
+        events.Add(DateTime.Now, $"{name} zostala zmieniona na {value}");
+    }
+
+    private async void ExportToPdf()
+    {
+        if (ExportedCollectionName is List<FileHistory>)
+        {
+            var rpt = new RptPdf<FileHistory>();
+            await JS.ToPdfFile(string.Concat(FileName, FileExtension), rpt.Report(ExportedCollectionName as List<FileHistory>, ExecutionTitleHeader));
+        }
+        else if (ExportedCollectionName is List<QualityDetail>)
+        {
+            var rpt = new RptPdf<QualityDetail>();
+            await JS.ToPdfFile(string.Concat(FileName, FileExtension), rpt.Report(ExportedCollectionName as List<QualityDetail>, ExecutionTitleHeader));
+        }
+    }
+
+    private async void ExportToCsv()
     {
         if (!ExtensionMethods.IsCollectionEmptyOrNull(ExportedCollectionName))
             return;

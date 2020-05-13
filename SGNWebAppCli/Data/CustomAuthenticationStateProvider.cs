@@ -14,7 +14,7 @@ namespace SGNWebAppCli.Data
         private ILocalStorageService _localStorageService;
         public IUserService _userService;
         private readonly HttpClient _httpClient;
-        public CustomAuthenticationStateProvider(ILocalStorageService localStorageService, IUserService userService,HttpClient httpClient)
+        public CustomAuthenticationStateProvider(ILocalStorageService localStorageService, IUserService userService, HttpClient httpClient)
         {
             _localStorageService = localStorageService;
             _userService = userService;
@@ -26,12 +26,15 @@ namespace SGNWebAppCli.Data
         {
             var accessToken = await _localStorageService.GetItemAsync<string>("accessToken");
             ClaimsIdentity identity;
-         
+
             if (!string.IsNullOrEmpty(accessToken))
             {
                 User user = await _userService.GetUserByAccessTokenAsync(accessToken);
-              
-                identity = GetClaimsIdentity(user);
+
+                // check if token time is expired we lost reference to user by UserEmailAddress  and have authentication error
+                //then we need to create new ClaimsIdentity with user from login page
+                identity = (user.UserEmailAddress is null) ? new ClaimsIdentity() : GetClaimsIdentity(user);
+
             }
             else
             {
@@ -48,7 +51,7 @@ namespace SGNWebAppCli.Data
             await _localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
 
             var identity = GetClaimsIdentity(user);
-      
+
             var claimsPrincipal = new ClaimsPrincipal(identity);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }

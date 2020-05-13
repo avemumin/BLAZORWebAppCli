@@ -36,7 +36,7 @@
         </div>
         <br />
         <div class="col-12 row">
-            <label class="col-2 font-weight-bold">Aktywny :</label>
+            <label class="col-2 font-weight-bold">Konto katywne :</label>
             <InputCheckbox @bind-Value="user.IsActive" />
         </div>
         <br />
@@ -63,8 +63,8 @@
                     <th>Imię</th>
                     <th>Nazwisko</th>
                     <th>Email</th>
-                    <th>Aktywny</th>
-                    <AuthorizeView Roles="owner">
+                    <th>Konto aktywne</th>
+                    <AuthorizeView Roles="owner,administrator">
                         <Authorized>
                             <th>Dostępne akcje</th>
                         </Authorized>
@@ -75,45 +75,43 @@
                 @foreach (var user in UsersList)
                 {
                     string aktywny = @user.IsActive ? "Tak" : "Nie";
-                <tr>
-                    <td>@user.IdUser</td>
-                    <td>@user.UserName</td>
-                    <td>@user.UserLastName</td>
-                    <td>
-                        <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
-                            @user.UserEmailAddress
-                        </NavLink>
-                    </td>
-                    <td>@aktywny</td>
+                    <tr>
+                        <td>@user.IdUser</td>
+                        <td>@user.UserName</td>
+                        <td>@user.UserLastName</td>
+                        <td>
+                            <AuthorizeView Roles="owner,administrator">
+                                <Authorized>
+                                    <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
+                                        @user.UserEmailAddress
+                                    </NavLink>
+                                </Authorized>
+                            </AuthorizeView>
+                            
+                        </td>
+                        <td>@aktywny</td>
 
-                    @*<td>
-                        <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                           @onclick="(()=>EditUser(user))">
-                            Edycja
-                        </a>
-                        <a>|</a>
-                        <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                           @onclick="(()=>DeleteUser(user.IdUser))">
-                            Usuń
-                        </a>
-                    </td>*@
+                        <th>
+                            <AuthorizeView Roles="owner,administrator">
+                                <Authorized>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                       @onclick="(()=>EditUser(user))">
+                                        Edycja
+                                    </a>
+                                </Authorized>
+                            </AuthorizeView>
 
-                    <AuthorizeView Roles="owner">
-                        <Authorized>
-                            <th>
-                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                                   @onclick="(()=>EditUser(user))">
-                                    Edycja
-                                </a>
-                                <a>|</a>
-                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                                   @onclick="(()=>DeleteUser(user.IdUser))">
-                                    Usuń
-                                </a>
-                            </th>
-                        </Authorized>
-                    </AuthorizeView>
-                </tr>
+                            <AuthorizeView Roles="owner">
+                                <Authorized>
+                                    <a>|</a>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                       @onclick="(()=>DeleteUser(user.IdUser))">
+                                        Usuń
+                                    </a>
+                                </Authorized>
+                            </AuthorizeView>
+                        </th>
+                    </tr>
                 }
 
             </tbody>
@@ -128,6 +126,8 @@
 
 
 @code {
+   
+     
     public User user { get; set; }
     public List<User> UsersList { get; set; }
     //  ElementReference firstNameTextBox;
@@ -136,7 +136,7 @@
     public string RecordName { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
-
+   
 
     protected override void OnInitialized()
     {

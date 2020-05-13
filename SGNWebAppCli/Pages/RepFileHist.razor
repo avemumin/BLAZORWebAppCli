@@ -1,6 +1,10 @@
 ﻿@page "/repfilehist"
+@using SGNWebAppCli.Shared
+@using SGNWebAppCli.Helpers
+@using SGNWebAppCli.Data
 @inject IReportSerivce<FileHistory> reportService
 @implements IDisposable
+@inject IJSRuntime JS
 @*@if (rfhList == null)
     {
         <LoadingData DisplayMessage="false"></LoadingData>
@@ -31,22 +35,51 @@
             <td><b>@rfh.IdCountResult</b> </td>
         </GridRow>
     </GridView>
+    <ExportDataButton ExportedCollectionName="rfhList"
+                      ExecutionTitleHeader="Export do pliku"
+                      @ref="refToExport"
+                      DefaultFileName="@ReportName"
+                      ButtonVisibility="IsVisible">
+        
+    </ExportDataButton>
   
 }
 
 @code {
+    private string ReportName = "Historia plików";
     public FileHistory rfh { get; set; }
     public List<FileHistory> rfhList { get; set; }
+    ExportDataButton<FileHistory> refToExport;
 
     protected override void OnInitialized()
     {
         rfh = new FileHistory();
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
             await LoadData();
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private bool IsVisible
+    {
+        get
+        {
+            if (!SGNWebAppCli.Helpers.ExtensionMethods.IsCollectionEmptyOrNull(rfhList))
+                return false;
+            else
+                return true;
+        }
+    }
+
+    public string FileName
+    {
+        get
+        {
+            return ReportName + " " + DateTime.Now;
+        }
     }
 
     private async Task LoadData()
