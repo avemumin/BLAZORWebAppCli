@@ -149,7 +149,7 @@ else
 
             IsSearchExecuted = true;
             //await Task.Delay(2000);
-            DuplicatesList = await reportService.GetAllAsync($"SerialNumbersDuplicates/{CurrencyPropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}",true);
+            DuplicatesList = await reportService.GetAllAsyncSN($"SerialNumbersDuplicates/{CurrencyPropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
             StateHasChanged();

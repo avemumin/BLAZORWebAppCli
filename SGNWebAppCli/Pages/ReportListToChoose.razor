@@ -19,11 +19,15 @@
         </a>
     </RadzenCard>
 
-    <RadzenCard>
-        <a href="/repfilehist" class="btn btn-info btn-lg active font-weight-bold" role="button" aria-pressed="true">
-            Testowy raport historii plików
-        </a>
-    </RadzenCard>
+    <AuthorizeView Roles="Owner,Administrator">
+        <Authorized>
+            <RadzenCard>
+                <a href="/repfilehist" class="btn btn-info btn-lg active font-weight-bold" role="button" aria-pressed="true">
+                    Testowy raport historii plików
+                </a>
+            </RadzenCard>
+        </Authorized>
+    </AuthorizeView>
 
 </div>
 @code {

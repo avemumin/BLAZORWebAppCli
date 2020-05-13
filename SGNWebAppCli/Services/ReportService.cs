@@ -27,6 +27,10 @@ namespace SGNWebAppCli.Services
             httpClient.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
             _httpClient = httpClient;
         }
+        /// <summary>
+        /// Special property for Serial numbers duplicates report to easy manage _httpClient.Timeout stamp value
+        /// </summary>
+        private double SnTime => _appSettings.BankntoteSerialNumberDuplicatesTimeProperty;
 
         //Delete  
         public async Task<bool> DeleteAsync(string requestUri, int Id)
@@ -45,7 +49,7 @@ namespace SGNWebAppCli.Services
         }
 
         //Get all
-        public async Task<List<T>> GetAllAsync(string requestUri, bool isSpecialMode = false)
+        public async Task<List<T>> GetAllAsync(string requestUri)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
@@ -56,12 +60,45 @@ namespace SGNWebAppCli.Services
 
             try
             {
-                //only for Duplicates Report changed Timeout value from 1m40s to 20 min
-                _httpClient.Timeout = isSpecialMode ? TimeSpan.FromMinutes(20) : TimeSpan.FromSeconds(100);
-
-
                 var response = await _httpClient.SendAsync(requestMessage);
 
+
+                var responseStatusCode = response.StatusCode;
+                if (responseStatusCode.ToString() == "OK")
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    return await Task.FromResult(JsonConvert.DeserializeObject<List<T>>(responseBody));
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+
+        }
+        /// <summary>
+        /// Yes duplicate method as one over this is bad practice but is a problem to change httpClient.Timeout
+        /// only for this report to not close connection this is a singleton instance !!
+        /// in json config is possible to change time value
+        /// </summary>
+        /// <param name="requestUri"></param>
+        /// <returns></returns>
+        public async Task<List<T>> GetAllAsyncSN(string requestUri)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+
+            var token = await _localStorageService.GetItemAsync<string>("accessToken");
+            requestMessage.Headers.Authorization
+                = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                _httpClient.Timeout = TimeSpan.FromMinutes(SnTime);
+
+                var response = await _httpClient.SendAsync(requestMessage);
 
                 var responseStatusCode = response.StatusCode;
                 if (responseStatusCode.ToString() == "OK")

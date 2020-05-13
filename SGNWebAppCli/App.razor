@@ -1,12 +1,17 @@
 ﻿
 <Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
-        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
+            <NotAuthorized>
+                <AccessDeniedInfo></AccessDeniedInfo>
+            </NotAuthorized>
+
+        </AuthorizeRouteView>
     </Found>
     <NotFound>
         <CascadingAuthenticationState>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p>Sorry, tu nic nie ma.</p>
+                <p>Sorry, ta strona jeszcze nie istnieje.</p>
             </LayoutView>
         </CascadingAuthenticationState>
     </NotFound>

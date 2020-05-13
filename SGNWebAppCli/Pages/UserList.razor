@@ -6,48 +6,53 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<div class="col-12">
-    <h3><b>Wprowadź dane użytkownika</b></h3>
-    <hr />
+    <div class="col-12">
+        <h3><b>Wprowadź dane użytkownika</b></h3>
+        <hr />
 
-    <ServerValidation IsVisible="IsVisible" Results="Result">
-        @RecordName
-    </ServerValidation>
+        <ServerValidation IsVisible="IsVisible" Results="Result">
+            @RecordName
+        </ServerValidation>
 
-    <EditForm Model="@user" OnValidSubmit="@SaveUser">
-        @*<DataAnnotationsValidator />*@
-        @*@ref="firstNameTextBox"*@
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">imię :</label>
-            <InputText class="form-control col-3" @bind-Value="user.UserName" placeholder="imię" />
-            &nbsp;<ValidationMessage For="@(() => user.UserName)" />
-        </div>
-        <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">nazwisko :</label>
-            <InputText class="form-control col-3" @bind-Value="user.UserLastName" placeholder="nazwisko" />
-            &nbsp;<ValidationMessage For="@(() => user.UserLastName)" />
-        </div>
-        <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">email  :</label>
-            <InputText class="form-control col-3" @bind-Value="user.UserEmailAddress" placeholder="email" />
-            &nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />
-        </div>
-        <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">Konto katywne :</label>
-            <InputCheckbox @bind-Value="user.IsActive" />
-        </div>
-        <br />
-        <div class="col-12 row">
-            <span class="col-2"></span>
-            <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
-            <span>&nbsp;</span>
-            @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
-        </div>
-    </EditForm>
-</div>
+        <EditForm Model="@user" OnValidSubmit="@SaveUser">
+            @*<DataAnnotationsValidator />*@
+            @*@ref="firstNameTextBox"*@
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">imię :</label>
+                <InputText class="form-control col-3" @bind-Value="user.UserName" placeholder="imię" />
+                &nbsp;<ValidationMessage For="@(() => user.UserName)" />
+            </div>
+            <br />
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">nazwisko :</label>
+                <InputText class="form-control col-3" @bind-Value="user.UserLastName" placeholder="nazwisko" />
+                &nbsp;<ValidationMessage For="@(() => user.UserLastName)" />
+            </div>
+            <br />
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">email  :</label>
+                <InputText class="form-control col-3" @bind-Value="user.UserEmailAddress" placeholder="email" />
+                &nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />
+            </div>
+            <br />
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">Konto katywne :</label>
+                <InputCheckbox @bind-Value="user.IsActive" />
+            </div>
+            <br />
+        </EditForm>
+        <AuthorizeView Roles="wner,Administrator">
+            <Authorized>
+               
+                <div class="col-12 row">
+                    <span class="col-2"></span>
+                    <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
+                    <span>&nbsp;</span>
+                    @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    </div>
 <br />
 
 <div class="col-10">
@@ -64,7 +69,7 @@
                     <th>Nazwisko</th>
                     <th>Email</th>
                     <th>Konto aktywne</th>
-                    <AuthorizeView Roles="owner,administrator">
+                    <AuthorizeView Roles="Owner,Administrator">
                         <Authorized>
                             <th>Dostępne akcje</th>
                         </Authorized>
@@ -80,7 +85,7 @@
                         <td>@user.UserName</td>
                         <td>@user.UserLastName</td>
                         <td>
-                            <AuthorizeView Roles="owner,administrator">
+                            <AuthorizeView Roles="Owner,Administrator">
                                 <Authorized>
                                     <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
                                         @user.UserEmailAddress
@@ -97,7 +102,7 @@
                         <td>@aktywny</td>
 
                         <th>
-                            <AuthorizeView Roles="owner,administrator">
+                            <AuthorizeView Roles="Owner,Administrator">
                                 <Authorized>
                                     <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
                                        @onclick="(()=>EditUser(user))">
@@ -106,7 +111,7 @@
                                 </Authorized>
                             </AuthorizeView>
 
-                            <AuthorizeView Roles="owner">
+                            <AuthorizeView Roles="Owner">
                                 <Authorized>
                                     <a>|</a>
                                     <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
