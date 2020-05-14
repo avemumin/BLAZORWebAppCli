@@ -35,23 +35,25 @@
                 &nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />
             </div>
             <br />
-            <div class="col-12 row">
-                <label class="col-2 font-weight-bold">Konto katywne :</label>
-                <InputCheckbox @bind-Value="user.IsActive" />
-            </div>
-            <br />
+            <AuthorizeView Roles="Owner,Administrator">
+                <Authorized Context="context1">
+                    <div class="col-12 row">
+                        <label class="col-2 font-weight-bold">Konto katywne :</label>
+                        <InputCheckbox @bind-Value="user.IsActive" />
+                    </div>
+                    <br />
+                    <div class="col-12 row">
+                        <span class="col-2"></span>
+                        <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
+                        <span>&nbsp;</span>
+                        @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
+                    </div>
+
+                </Authorized>
+            </AuthorizeView>
+
         </EditForm>
-        <AuthorizeView Roles="Owner,Administrator">
-            <Authorized>
-               
-                <div class="col-12 row">
-                    <span class="col-2"></span>
-                    <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
-                    <span>&nbsp;</span>
-                    @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
-                </div>
-            </Authorized>
-        </AuthorizeView>
+       
     </div>
 <br />
 
@@ -92,7 +94,7 @@
                                     </NavLink>
                                 </Authorized>
                             </AuthorizeView>
-                            <AuthorizeView Roles="Nowy-Użytkownik">
+                            <AuthorizeView Roles="NewUser,RegularUser">
                                 <Authorized>
                                     <a>@user.UserEmailAddress</a>
                                 </Authorized>
@@ -137,7 +139,7 @@
 
 @code {
 
-
+   
     public User user { get; set; }
     public List<User> UsersList { get; set; }
     //  ElementReference firstNameTextBox;
@@ -150,7 +152,7 @@
 
     protected override void OnInitialized()
     {
-        user = new User();
+        user = new User();     
         Console.WriteLine("User - OnInitialized");
         base.OnInitialized();
     }
@@ -242,7 +244,7 @@
             await reportSerivce.SaveAsync("users/CreateUser/", user);
         else
             await reportSerivce.UpdateAsync("users/UpdateUser/", user.IdUser, user);
-
+        
         await LoadUsers();
 
         Result = true;
