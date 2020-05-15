@@ -1,17 +1,21 @@
 ﻿@page "/settings"
 
-    <div class="middle-box">
-        <RadzenCard>
-            <a href="/userlist" class="btn btn-primary btn-lg active font-weight-bold" role="button" aria-pressed="true">
-               Użytkownicy
-            </a>
-        </RadzenCard>
+<AuthorizeView Roles="Owner,Administrator">
+    <Authorized>
+        <div class="middle-box">
+            <RadzenCard>
+                <a href="/userlist" class="btn btn-primary btn-lg active font-weight-bold" role="button" aria-pressed="true">
+                    Użytkownicy
+                </a>
+            </RadzenCard>
 
-        @*<RadzenCard>
-            <a href="/maillist" class="btn btn-warning btn-lg active font-weight-bold" role="button" aria-pressed="true">
-                Lista mailingowa
-            </a>
-        </RadzenCard>*@
+            @*<RadzenCard>
+                    <a href="/maillist" class="btn btn-warning btn-lg active font-weight-bold" role="button" aria-pressed="true">
+                        Lista mailingowa
+                    </a>
+                </RadzenCard>*@
 
-        
-    </div>
+
+        </div>
+    </Authorized>
+</AuthorizeView>

@@ -1,25 +1,26 @@
 ﻿@page "/reportstochoose"
 
 <div class="middle-box">
-    <RadzenCard>
-        <a href="/qualityreport" class="btn btn-primary btn-lg active font-weight-bold" role="button" aria-pressed="true">
-            Raport jakościowy
-        </a>
-    </RadzenCard>
+    <AuthorizeView Roles="Owner,Administrator,RegularUser">
+        <RadzenCard>
+            <a href="/qualityreport" class="btn btn-primary btn-lg active font-weight-bold" role="button" aria-pressed="true">
+                Raport jakościowy
+            </a>
+        </RadzenCard>
 
-    <RadzenCard>
-        <a href="/qualityreportmachines" class="btn btn-warning btn-lg active font-weight-bold" role="button" aria-pressed="true">
-            Raport jakościowy w rozbiciu na urządzenia liczące
-        </a>
-    </RadzenCard>
+        <RadzenCard>
+            <a href="/qualityreportmachines" class="btn btn-warning btn-lg active font-weight-bold" role="button" aria-pressed="true">
+                Raport jakościowy w rozbiciu na urządzenia liczące
+            </a>
+        </RadzenCard>
 
-    <RadzenCard>
-        <a href="/banknotesnduplication" class="btn btn-success btn-lg active font-weight-bold" role="button" aria-pressed="true">
-            Raport powtórzonych wystąpień numerów seryjnych
-        </a>
-    </RadzenCard>
-
-    <AuthorizeView Roles="Owner,Administrator">
+        <RadzenCard>
+            <a href="/banknotesnduplication" class="btn btn-success btn-lg active font-weight-bold" role="button" aria-pressed="true">
+                Raport powtórzonych wystąpień numerów seryjnych
+            </a>
+        </RadzenCard>
+    </AuthorizeView>
+    <AuthorizeView Roles="Owner">
         <Authorized>
             <RadzenCard>
                 <a href="/repfilehist" class="btn btn-info btn-lg active font-weight-bold" role="button" aria-pressed="true">

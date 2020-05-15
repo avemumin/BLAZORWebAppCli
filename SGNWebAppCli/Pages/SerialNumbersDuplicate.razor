@@ -2,93 +2,95 @@
 @inject IReportSerivce<SerialNumbersDuplicates> reportService
 @inject IReportSerivce<Currency> dictionaryCurrencyService
 
-
-<p style="font-size:16px;text-align:center"><b>Raport duplikatów</b></p>
-<div style="text-align:center;  font-weight:bold;width:310px;height:300px;  display:flex;margin:0px 5px 0px 5px">
-    <div style="width: 150px; height: auto; text-align: left;margin-left:5px">
-        <p style="text-align:center">Waluta</p>
-        <RadzenListBox AllowFiltering="false"
-                       FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                       @bind-Value="dictionaryCurrenciesId"
-                       Multiple="true"
-                       Data="@dictionaryCurrencies"
-                       TextProperty="Symbol"
-                       ValueProperty="IdCurrency"
-                       Change="@(args=>ChangeCurrencyDictionary(args,string.Empty))"
-                       Style="height:255px;width:148px" />
-    </div>
-    <div style="width: 150px; height: auto;margin-left:5px">
-        <div>
-            <p style="text-align:center">Od dnia:</p>
-            <RadzenDatePicker ShowTime="false"
-                              @bind-Value="@StartDate"
-                              DateFormat="dd-MM-yyyy"
-                              ReadOnly="true" />
-        </div>
-        <hr />
-        <div>
-
-            <p style="text-align:center">Od dnia:</p>
-            <RadzenDatePicker ShowTime="false"
-                              @bind-Value="@EndDate"
-                              DateFormat="dd-MM-yyyy"
-                              ReadOnly="true" />
-
-        </div>
-        <div>
-            <br />
-            <div>
-                <RadzenButton Click="executeSearching" Text="Wyszukaj"></RadzenButton>
+<AuthorizeView Roles="Administrator,RegularUser" Policy="ActiveUser">
+    <Authorized>
+        <p style="font-size:16px;text-align:center"><b>Raport duplikatów</b></p>
+        <div style="text-align:center;  font-weight:bold;width:310px;height:300px;  display:flex;margin:0px 5px 0px 5px">
+            <div style="width: 150px; height: auto; text-align: left;margin-left:5px">
+                <p style="text-align:center">Waluta</p>
+                <RadzenListBox AllowFiltering="false"
+                               FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                               @bind-Value="dictionaryCurrenciesId"
+                               Multiple="true"
+                               Data="@dictionaryCurrencies"
+                               TextProperty="Symbol"
+                               ValueProperty="IdCurrency"
+                               Change="@(args=>ChangeCurrencyDictionary(args,string.Empty))"
+                               Style="height:255px;width:148px" />
             </div>
+            <div style="width: 150px; height: auto;margin-left:5px">
+                <div>
+                    <p style="text-align:center">Od dnia:</p>
+                    <RadzenDatePicker ShowTime="false"
+                                      @bind-Value="@StartDate"
+                                      DateFormat="dd-MM-yyyy"
+                                      ReadOnly="true" />
+                </div>
+                <hr />
+                <div>
 
+                    <p style="text-align:center">Od dnia:</p>
+                    <RadzenDatePicker ShowTime="false"
+                                      @bind-Value="@EndDate"
+                                      DateFormat="dd-MM-yyyy"
+                                      ReadOnly="true" />
+
+                </div>
+                <div>
+                    <br />
+                    <div>
+                        <RadzenButton Click="executeSearching" Text="Wyszukaj"></RadzenButton>
+                    </div>
+
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-@if (DisplayError == true)
-{
-    <div style="align-content:center;width:auto">
-        <div style="align-content:center;width:620px ">
-            <RadzenTextBox Visible="@CheckCurrency" Disabled="true" Value="Nie uzupełniono filtra 'WALUTA' "
-                           Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
-        </div>
-        <div style="align-content:center;width:620px">
-            <RadzenTextBox Visible="@CheckDateStampCorrect" Disabled="true" Value="'DATA OD' nie może być większa niż 'DATA DO'"
-                           Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
-        </div>
-    </div>
-}
-@if (IsSearchExecuted == true)
-{
-    <LoadingData DisplayMessage="true"></LoadingData>
-}
-else if (DuplicatesList == null || DuplicatesList.Count == 0)
-{
-    @if (AfterExecuted)
-    {
-        <p>Brak wyników dla podanych kryteriów</p>
-    }
+        @if (DisplayError == true)
+        {
+            <div style="align-content:center;width:auto">
+                <div style="align-content:center;width:620px ">
+                    <RadzenTextBox Visible="@CheckCurrency" Disabled="true" Value="Nie uzupełniono filtra 'WALUTA' "
+                                   Style="background-color:red;color:black;width:620px;text-align:center;font-weight:bold" />
+                </div>
+                <div style="align-content:center;width:620px">
+                    <RadzenTextBox Visible="@CheckDateStampCorrect" Disabled="true" Value="'DATA OD' nie może być większa niż 'DATA DO'"
+                                   Style="background-color:red;color:black ;width:620px;text-align:center;font-weight:bold" />
+                </div>
+            </div>
+        }
+        @if (IsSearchExecuted == true)
+        {
+            <LoadingData DisplayMessage="true"></LoadingData>
+        }
+        else if (DuplicatesList == null || DuplicatesList.Count == 0)
+        {
+            @if (AfterExecuted)
+            {
+                <p>Brak wyników dla podanych kryteriów</p>
+            }
 
-}
-else
-{
+        }
+        else
+        {
 
-    <div>
-        <br />
-        <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-                    AllowSorting="true" Data="@DuplicatesList" TItem="SerialNumbersDuplicates" ColumnWidth="150px">
-            <Columns>
-                @*<RadzenGridColumn TItem="SerialNumbersDuplicates" Property="IdMachine" Title="Id" TextAlign="TextAlign.Center" />*@
-                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="SN" Title="Numer urządzenia" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="Counts" Title="Powtórzenia" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="BanknoteSN" Title="Numer seryjny banknotu" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="FaceValue" Title="Nominał" TextAlign="TextAlign.Center" />
-                <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="Symbol" Title="Waluta" TextAlign="TextAlign.Center" />
-            </Columns>
-        </RadzenGrid>
-    </div>
-}
-
+            <div>
+                <br />
+                <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                            AllowSorting="true" Data="@DuplicatesList" TItem="SerialNumbersDuplicates" ColumnWidth="150px">
+                    <Columns>
+                        @*<RadzenGridColumn TItem="SerialNumbersDuplicates" Property="IdMachine" Title="Id" TextAlign="TextAlign.Center" />*@
+                        <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="SN" Title="Numer urządzenia" TextAlign="TextAlign.Center" />
+                        <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="Counts" Title="Powtórzenia" TextAlign="TextAlign.Center" />
+                        <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="BanknoteSN" Title="Numer seryjny banknotu" TextAlign="TextAlign.Center" />
+                        <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="FaceValue" Title="Nominał" TextAlign="TextAlign.Center" />
+                        <RadzenGridColumn TItem="SerialNumbersDuplicates" Property="Symbol" Title="Waluta" TextAlign="TextAlign.Center" />
+                    </Columns>
+                </RadzenGrid>
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
 @code {
     private bool IsSearchExecuted { get; set; } = false;
     List<SerialNumbersDuplicates> DuplicatesList;
