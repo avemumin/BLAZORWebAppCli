@@ -4,27 +4,111 @@
 @using SGNWebAppCli.Data
 @using SGNWebAppCli.Services
 @inject IReportSerivce<User> userService
+@inject IReportSerivce<Role> roleService
+@inject NavigationManager GoToPage
 
-<h3>Tu będzie słownik zarządzania rolami w chwili obecnej domyślnie jest wybierany z możliwością pracy po aktywacji.</h3>
-<div class="col-12 row">
 
-    @if (UserDetails != null)
-    {
-        <h5 class="col-12 row" style="font-weight:bold">@UserDetails.UserName @UserDetails.UserLastName</h5>
-        <h6 class="col-12 row">Aktywny: @UserDetails.IsActive</h6>
+    <EditForm Model="@UserDetails" >
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">imię :</label>
+            <input type="text" class="form-control col-3" @bind="UserDetails.UserName" />
+            
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">nazwisko :</label>
+            <input type="text" class="form-control col-3" @bind="UserDetails.UserLastName" />
+            
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">email  :</label>
+            <input type="text" class="form-control col-3" @bind="UserDetails.UserEmailAddress" readonly/>
+            @*&nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />*@
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">obecna rola  :</label>
+            <input type="text" class="form-control col-3" @bind="RolesDetails.RoleDescription" readonly />
+            
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">nowa rola  :</label>
+            <RadzenDropDown AllowClear="false"
+                            TValue="string"
+                            Data="@dictionaryRolesId"
+                            TextProperty="RoleDescription"
+                            ValueProperty="RoleId"
+                            Change="@(args=> Change(args,"DropDown"))" />
+    
+        </div>
+        <br />
+        <div>
+            <a>
+                <button class="form-control col-1 btn btn-primary" @onclick="(() => Save(UserDetails))">Zapisz</button>
+            </a>
 
-    }
-
-</div>
+            <a>
+                <button class="form-control col-1 btn btn-secondary" @onclick="(() => BackTo())">Wróć</button>
+            </a>
+        </div>
+    </EditForm>
 
 @code {
     [Parameter]
     public int userid { get; set; }
 
-    public User UserDetails { get; set; }
+    public User UserDetails { get; set; }// = new User();
+    public Role RolesDetails { get; set; }// = new Role();
 
-    //protected async override Task OnInitializedAsync()
+    private byte RolesPropertyKey { get; set; }
+    private IEnumerable<Role> dictionaryRoles { get; set; }
+    private IEnumerable<string> dictionaryRolesId;
+
+    private Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        UserDetails = new User();
+        RolesDetails = new Role();
+        UserDetails = await userService.GetByIdAsync("users/GetUser/", userid);
+        RolesDetails = UserDetails.Role;
+        dictionaryRoles = await roleService.GetAllAsync("roles/");
+        dictionaryRolesId = dictionaryRoles.Select(x => x.RoleDescription);
+
+
+    }
+
+    //private string Descriptor(byte id)
     //{
-    //    UserDetails = await userService.GetByIdAsync("users/GetUser/", userid);
+    //    return dictionaryRoles.Where(x => x.RoleId == id).Select(x => x.RoleDescription).FirstOrDefault();
     //}
+
+    private async Task Save(User someUser)
+    {
+        if (someUser != null)
+        {
+            someUser.RoleId = RolesPropertyKey;
+            UserDetails = await userService.UpdateAsync("users/UpdateUser/", someUser.IdUser, someUser);
+            UserDetails = new User();
+            GoToPage.NavigateTo("/userlist");
+        }
+    }
+    private void BackTo()
+    {
+        GoToPage.NavigateTo("/userlist");
+    }
+
+
+    void Change(object value, string name)
+    {
+        RolesPropertyKey = RolesDetails.RoleId;
+        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+
+        events.Add(DateTime.Now, $"{name} value changed to {str}");
+        RolesPropertyKey = dictionaryRoles.Where(x => x.RoleDescription.Equals(str)).Select(x => x.RoleId).FirstOrDefault();
+        StateHasChanged();
+    }
 }

@@ -41,14 +41,23 @@ namespace SGNWebAppCli
             services.AddHttpClient<IReportSerivce<Currency>, ReportService<Currency>>();
             services.AddHttpClient<IReportSerivce<Mode>, ReportService<Mode>>();
             services.AddHttpClient<IReportSerivce<Quality>, ReportService<Quality>>();
-            services.AddHttpClient<IReportSerivce<QualityDetail>, ReportService<QualityDetail>>();
             services.AddHttpClient<IReportSerivce<Machine>, ReportService<Machine>>();
-            services.AddHttpClient<IReportSerivce<QualityDetailAndMachine>, ReportService<QualityDetailAndMachine>>();
+            services.AddHttpClient<IReportSerivce<Role>, ReportService<Role>>();
+
+            services.AddHttpClient<IReportSerivce<QualityDetail>, ReportService<QualityDetail>>()
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
+            
+            
+            
+            services.AddHttpClient<IReportSerivce<QualityDetailAndMachine>, ReportService<QualityDetailAndMachine>>()
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
 
             services.AddHttpClient<IReportSerivce<FileHistory>, ReportService<FileHistory>>()
                 .AddHttpMessageHandler<ValidateHeaderHandler>();
 
-            services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>, ReportService<SerialNumbersDuplicates>>();
+            services.AddHttpClient<IReportSerivce<SerialNumbersDuplicates>, ReportService<SerialNumbersDuplicates>>()
+            .AddHttpMessageHandler<ValidateHeaderHandler>();
+
             services.AddHttpClient<IReportSerivce<User>, ReportService<User>>()
                 .AddHttpMessageHandler<ValidateHeaderHandler>();
 

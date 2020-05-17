@@ -194,7 +194,7 @@
 
         </Authorized>
     <NotAuthorized>
-       
+        <AccessDeniedInfo></AccessDeniedInfo>
     </NotAuthorized>
     </AuthorizeView>
 
@@ -288,8 +288,6 @@
 
                 try
                 {
-                    QualityMachinesList.Clear();
-                    StateHasChanged();
                     IsSearchExecuted = true;
                     QualityMachinesList = await reportService.GetAllAsync($"qualitiesextreport/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
                     MachinesCollection = await Task.Run(() => MachineList());

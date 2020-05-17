@@ -1,7 +1,7 @@
 ﻿@page "/reportstochoose"
 
 <div class="middle-box">
-    <AuthorizeView Roles="Owner,Administrator,RegularUser">
+    <AuthorizeView Roles="Administrator,RegularUser">
         <RadzenCard>
             <a href="/qualityreport" class="btn btn-primary btn-lg active font-weight-bold" role="button" aria-pressed="true">
                 Raport jakościowy
@@ -20,6 +20,7 @@
             </a>
         </RadzenCard>
     </AuthorizeView>
+
     <AuthorizeView Roles="Owner">
         <Authorized>
             <RadzenCard>

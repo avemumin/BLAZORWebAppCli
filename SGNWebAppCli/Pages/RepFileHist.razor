@@ -5,57 +5,58 @@
 @inject IReportSerivce<FileHistory> reportService
 @implements IDisposable
 @inject IJSRuntime JS
-@attribute [Authorize(Policy = "ActiveUser", Roles ="Owner,Administrator")]
+@attribute [Authorize(Policy = "ActiveUser", Roles = "Owner,Administrator")]
 
-    <AuthorizeView Roles="Owner" Policy="ActiveUser">
-        <Authorized>
-            @*@if (rfhList == null)
-        {
-            <LoadingData DisplayMessage="false"></LoadingData>
-        }
-        else if (rfhList.Count == 0)
-        {
-            <text> Brak danych do wyświetlenia </text>
-        }
-        else
-        { }*@
-            @if (rfhList != null)
+<AuthorizeView Roles="Owner" Policy="ActiveUser">
+    <Authorized>
+        <h4>Historia plików - zestawienie zawierające pliki z niepowodzeniem </h4>
+        @*@if (rfhList == null)
             {
-                <GridView Items="rfhList">
-                    <GridColumns>
-                        <GridColumn ColumnTitle="ID"></GridColumn>
-                        <GridColumn ColumnTitle="Nazwa pliku"></GridColumn>
-                        <GridColumn ColumnTitle="Powodzenie"></GridColumn>
-                        <GridColumn ColumnTitle="Opis błędu"></GridColumn>
-                        <GridColumn ColumnTitle="Data"></GridColumn>
-                        <GridColumn ColumnTitle="Id zliczenia"></GridColumn>
-                    </GridColumns>
-                    <GridRow Context="rfh">
-                        <td><b>@rfh.IdFileHistory</b> </td>
-                        <td><b>@rfh.FileName</b> </td>
-                        <td><b>@rfh.IsProceededSuccess</b> </td>
-                        <td><b>@rfh.ErrorDescription</b> </td>
-                        <td><b>@rfh.ProcessDate</b> </td>
-                        <td><b>@rfh.IdCountResult</b> </td>
-                    </GridRow>
-                </GridView>
-
-                <ExportDataButton ExportedCollectionName="rfhList"
-                                  ExecutionTitleHeader="Export do pliku"
-                                  @ref="refToExport"
-                                  DefaultFileName="@ReportName"
-                                  ButtonVisibility="IsVisible">
-
-                </ExportDataButton>
-
+                <LoadingData DisplayMessage="false"></LoadingData>
             }
-        </Authorized>
-        <NotAuthorized>
-            
-        </NotAuthorized>
-    </AuthorizeView>
+            else if (rfhList.Count == 0)
+            {
+                <text> Brak danych do wyświetlenia </text>
+            }
+            else
+            { }*@
+        @if (rfhList != null)
+        {
+            <GridView Items="rfhList">
+                <GridColumns>
+                    <GridColumn ColumnTitle="ID"></GridColumn>
+                    <GridColumn ColumnTitle="Nazwa pliku"></GridColumn>
+                    <GridColumn ColumnTitle="Powodzenie"></GridColumn>
+                    <GridColumn ColumnTitle="Opis błędu"></GridColumn>
+                    <GridColumn ColumnTitle="Data"></GridColumn>
+                    <GridColumn ColumnTitle="Id zliczenia"></GridColumn>
+                </GridColumns>
+                <GridRow Context="rfh">
+                    <td><b>@rfh.IdFileHistory</b> </td>
+                    <td><b>@rfh.FileName</b> </td>
+                    <td><b>@rfh.IsProceededSuccess</b> </td>
+                    <td><b>@rfh.ErrorDescription</b> </td>
+                    <td><b>@rfh.ProcessDate</b> </td>
+                    <td><b>@rfh.IdCountResult</b> </td>
+                </GridRow>
+            </GridView>
+
+            <ExportDataButton ExportedCollectionName="rfhList"
+                              ExecutionTitleHeader="Export do pliku"
+                              @ref="refToExport"
+                              DefaultFileName="@ReportName"
+                              ButtonVisibility="IsVisible">
+
+            </ExportDataButton>
+
+        }
+    </Authorized>
+    <NotAuthorized>
+        <AccessDeniedInfo></AccessDeniedInfo>
+    </NotAuthorized>
+</AuthorizeView>
 @code {
-    private string ReportName = "Historia plików";
+    private string ReportName = "Historia importu plików";
     public FileHistory rfh { get; set; }
     public List<FileHistory> rfhList { get; set; }
     ExportDataButton<FileHistory> refToExport;

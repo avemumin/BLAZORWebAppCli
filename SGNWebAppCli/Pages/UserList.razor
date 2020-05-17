@@ -6,140 +6,188 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
-    <div class="col-12">
-        <h3><b>Wprowadź dane użytkownika</b></h3>
-        <hr />
 
-        <ServerValidation IsVisible="IsVisible" Results="Result">
-            @RecordName
-        </ServerValidation>
+<AuthorizeView Roles="Owner,Administrator">
+    <Authorized Context="some">
+        <div class="col-12">
+            <h3><b>Lista użytkowników</b></h3>
+            <hr />
 
-        <EditForm Model="@user" OnValidSubmit="@SaveUser">
-            @*<DataAnnotationsValidator />*@
-            @*@ref="firstNameTextBox"*@
-            <div class="col-12 row">
-                <label class="col-2 font-weight-bold">imię :</label>
-                <InputText class="form-control col-3" @bind-Value="user.UserName" placeholder="imię" />
-                &nbsp;<ValidationMessage For="@(() => user.UserName)" />
-            </div>
-            <br />
-            <div class="col-12 row">
-                <label class="col-2 font-weight-bold">nazwisko :</label>
-                <InputText class="form-control col-3" @bind-Value="user.UserLastName" placeholder="nazwisko" />
-                &nbsp;<ValidationMessage For="@(() => user.UserLastName)" />
-            </div>
-            <br />
-            <div class="col-12 row">
-                <label class="col-2 font-weight-bold">email  :</label>
-                <InputText class="form-control col-3" @bind-Value="user.UserEmailAddress" placeholder="email" />
-                &nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />
-            </div>
-            <br />
-            <AuthorizeView Roles="Owner,Administrator">
-                <Authorized Context="context1">
-                    <div class="col-12 row">
-                        <label class="col-2 font-weight-bold">Konto katywne :</label>
-                        <InputCheckbox @bind-Value="user.IsActive" />
-                    </div>
-                    <br />
-                    <div class="col-12 row">
-                        <span class="col-2"></span>
-                        <input type="submit" class="form-control col-1 btn btn-primary" value="Zapisz" />
-                        <span>&nbsp;</span>
-                        @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
-                    </div>
+            <ServerValidation IsVisible="IsVisible" Results="Result">
+                @RecordName
+            </ServerValidation>
 
-                </Authorized>
-            </AuthorizeView>
+            <EditForm Model="@user" OnValidSubmit="@SaveUser">
+                @*<DataAnnotationsValidator />*@
+                @*@ref="firstNameTextBox"*@
+                <div class="col-12 row">
+                    <label class="col-2 font-weight-bold">imię :</label>
+                    <input type="text" readonly class="form-control col-3" @bind="user.UserName" placeholder="imię" />
+                    @*&nbsp;<ValidationMessage For="@(() => user.UserName)" />*@
+                </div>
+                <br />
+                <div class="col-12 row">
+                    <label class="col-2 font-weight-bold">nazwisko :</label>
+                    <input type="text" readonly class="form-control col-3" @bind="user.UserLastName" placeholder="nazwisko" />
+                    @*&nbsp;<ValidationMessage For="@(() => user.UserLastName)" />*@
+                </div>
+                <br />
+                <div class="col-12 row">
+                    <label class="col-2 font-weight-bold">email  :</label>
+                    <input type="text" readonly class="form-control col-3" @bind="user.UserEmailAddress" placeholder="email" />
+                    @*&nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />*@
+                </div>
+                <br />
+                <AuthorizeView Roles="Owner,Administrator">
+                    <Authorized Context="context1">
+                        <div class="col-12 row">
+                            <label class="col-2 font-weight-bold">Konto aktywne :</label>
+                            <InputCheckbox @bind-Value="user.IsActive" />
+                        </div>
+                        <br />
+                        <div class="col-12 row">
+                            <span class="col-2"></span>
+                            <input type="submit" class="form-control col-1 btn btn-primary" value="Zapisz" />
+                            <span>&nbsp;</span>
+                            @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
+                        </div>
 
-        </EditForm>
-       
-    </div>
-<br />
+                    </Authorized>
+                </AuthorizeView>
 
-<div class="col-10">
+            </EditForm>
 
-    <h3><b>Użytkownicy</b></h3>
+        </div>
+        <br />
 
-    @if (UsersList != null)
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Imię</th>
-                    <th>Nazwisko</th>
-                    <th>Email</th>
-                    <th>Konto aktywne</th>
-                    <AuthorizeView Roles="Owner,Administrator">
-                        <Authorized>
-                            <th>Dostępne akcje</th>
-                        </Authorized>
-                    </AuthorizeView>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var user in UsersList)
-                {
-                    string aktywny = @user.IsActive ? "Tak" : "Nie";
-                    <tr>
-                        <td>@user.IdUser</td>
-                        <td>@user.UserName</td>
-                        <td>@user.UserLastName</td>
-                        <td>
+        <div class="col-10">
+
+            <h3><b>Użytkownicy</b></h3>
+
+            @if (UsersList != null)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Imię</th>
+                            <th>Nazwisko</th>
+                            <th>Email</th>
+                            <th>Konto aktywne</th>
                             <AuthorizeView Roles="Owner,Administrator">
                                 <Authorized>
-                                    <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
-                                        @user.UserEmailAddress
-                                    </NavLink>
+                                    <th>Dostępne akcje</th>
                                 </Authorized>
                             </AuthorizeView>
-                            <AuthorizeView Roles="NewUser,RegularUser">
-                                <Authorized>
-                                    <a>@user.UserEmailAddress</a>
-                                </Authorized>
-                            </AuthorizeView>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in UsersList)
+                        {
+                            string aktywny = @user.IsActive ? "Tak" : "Nie";
+                            if (!user.IsActive)
+                            {
+                                <tr style="background-color:burlywood; font-weight:bold">
+                                    <td>@user.IdUser</td>
+                                    <td>@user.UserName</td>
+                                    <td>@user.UserLastName</td>
+                                    <td>
+                                        <AuthorizeView Roles="Owner,Administrator">
+                                            <Authorized>
+                                                <NavLink href="@string.Format("/userlist/userdetail/{0}", @user.IdUser)">
+                                                    @user.UserEmailAddress
+                                                </NavLink>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                        <AuthorizeView Roles="NewUser,RegularUser">
+                                            <Authorized>
+                                                <a>@user.UserEmailAddress</a>
+                                            </Authorized>
+                                        </AuthorizeView>
 
-                        </td>
-                        <td>@aktywny</td>
+                                    </td>
+                                    <td>@aktywny</td>
 
-                        <th>
-                            <AuthorizeView Roles="Owner,Administrator">
-                                <Authorized>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                                       @onclick="(()=>EditUser(user))">
-                                        Edycja
-                                    </a>
-                                </Authorized>
-                            </AuthorizeView>
+                                    <th>
+                                        <AuthorizeView Roles="Owner,Administrator">
+                                            <Authorized>
+                                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                                   @onclick="(() => EditUser(user))">
+                                                    Edycja
+                                                </a>
+                                            </Authorized>
+                                        </AuthorizeView>
 
-                            <AuthorizeView Roles="Owner">
-                                <Authorized>
-                                    <a>|</a>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                                       @onclick="(()=>DeleteUser(user.IdUser))">
-                                        Usuń
-                                    </a>
-                                </Authorized>
-                            </AuthorizeView>
-                        </th>
-                    </tr>
-                }
+                                        <AuthorizeView Roles="Owner">
+                                            <Authorized>
+                                                <a>|</a>
+                                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                                   @onclick="(() => DeleteUser(user.IdUser))">
+                                                    Usuń
+                                                </a>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                    </th>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>@user.IdUser</td>
+                                    <td>@user.UserName</td>
+                                    <td>@user.UserLastName</td>
+                                    <td>
+                                        <AuthorizeView Roles="Owner,Administrator">
+                                            <Authorized>
+                                                <NavLink href="@string.Format("/userlist/userdetail/{0}",@user.IdUser)">
+                                                    @user.UserEmailAddress
+                                                </NavLink>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                        <AuthorizeView Roles="NewUser,RegularUser">
+                                            <Authorized>
+                                                <a>@user.UserEmailAddress</a>
+                                            </Authorized>
+                                        </AuthorizeView>
 
-            </tbody>
+                                    </td>
+                                    <td>@aktywny</td>
 
-        </table>
-    }
+                                    <th>
+                                        <AuthorizeView Roles="Owner,Administrator">
+                                            <Authorized>
+                                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                                   @onclick="(()=>EditUser(user))">
+                                                    Edycja
+                                                </a>
+                                            </Authorized>
+                                        </AuthorizeView>
 
+                                        <AuthorizeView Roles="Owner">
+                                            <Authorized>
+                                                <a>|</a>
+                                                <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                                                   @onclick="(()=>DeleteUser(user.IdUser))">
+                                                    Usuń
+                                                </a>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                    </th>
+                                </tr>
+                            }
+                        }
 
-</div>
+                    </tbody>
+                </table>
+            }
+        </div>
 
-
-
+    </Authorized>
+</AuthorizeView>
 
 @code {
 
-   
+
     public User user { get; set; }
     public List<User> UsersList { get; set; }
     //  ElementReference firstNameTextBox;
@@ -148,11 +196,12 @@
     public string RecordName { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
-    public AuthenticationState MyProperty { get; set; }
+
+    public bool DeleteQuestion { get; set; }
 
     protected override void OnInitialized()
     {
-        user = new User();     
+        user = new User();
         Console.WriteLine("User - OnInitialized");
         base.OnInitialized();
     }
@@ -163,8 +212,6 @@
 
         user = new User();
         UsersList = new List<User>();
-
-
         await base.OnInitializedAsync();
     }
 
@@ -202,6 +249,7 @@
             StateHasChanged();
         }
     }
+
     private async Task LoadUsers()
     {
         UsersList = await reportSerivce.GetAllAsync("users/GetUsers/");
@@ -218,19 +266,26 @@
         }
         StateHasChanged();
     }
+
     private void EditUser(User argUser)
     {
         user = argUser;
     }
 
+
     private async Task DeleteUser(int authorId)
     {
+        var selectedUser = await reportSerivce.GetByIdAsync("users/GetUser/",authorId);
+        if(selectedUser !=null && DeleteQuestion)
+        {
+
+        }
 
         await reportSerivce.DeleteAsync("users/DeleteUser/", authorId);
         await LoadUsers();
         Result = true;
         IsVisible = true;
-        //throw new Exception("DeleteAuthor");
+
     }
     public void Dispose()
     {
@@ -239,12 +294,11 @@
     private async Task SaveUser()
     {
 
-
         if (user.IdUser == 0)
             await reportSerivce.SaveAsync("users/CreateUser/", user);
         else
             await reportSerivce.UpdateAsync("users/UpdateUser/", user.IdUser, user);
-        
+
         await LoadUsers();
 
         Result = true;
@@ -259,6 +313,7 @@
         // await JSRuntime.InvokeVoidAsync("setFocusOnElement", firstNameTextBox);
 
         user = new User();
+
     }
 
 

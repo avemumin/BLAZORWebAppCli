@@ -130,7 +130,7 @@
 
     </Authorized>
     <NotAuthorized>
-        <p></p>
+        <AccessDeniedInfo></AccessDeniedInfo>
     </NotAuthorized>
 </AuthorizeView>
 @code {
@@ -221,7 +221,7 @@
         {
 
             IsSearchExecuted = true;
-            await Task.Delay(2000);
+          //  await Task.Delay(2000);
             QualityList = await reportService.GetAllAsync($"qualitiesreport/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
