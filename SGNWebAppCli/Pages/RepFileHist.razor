@@ -7,7 +7,7 @@
 @inject IJSRuntime JS
 @attribute [Authorize(Policy = "ActiveUser", Roles = "Owner,Administrator")]
 
-<AuthorizeView Roles="Owner" Policy="ActiveUser">
+<AuthorizeView Roles="Owner,Administrator" Policy="ActiveUser">
     <Authorized>
         <h4>Historia plików - zestawienie zawierające pliki z niepowodzeniem </h4>
         @*@if (rfhList == null)
