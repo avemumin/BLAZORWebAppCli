@@ -129,7 +129,7 @@
                     }
                     else
                     {
-                        <div style="display:inline-flex;height:auto;width:1200px">
+                        <div style="display:inline-flex;height:auto;">
                             <div class=" border">
                                 <div>
                                     <RadzenTabs>
@@ -144,7 +144,8 @@
                                                             AllowPaging="true"
                                                             PageSize="10"
                                                             RowSelect="@(arg=>machine=arg)"
-                                                            Style="width:400px;height:540px">
+                                                            Style="width:300px;height:540px"
+                                                            @onclick="(()=>Selected(true))">
                                                     <Columns>
                                                         <RadzenGridColumn Title="Numer urządzenia"
                                                                           TItem="Machine"
@@ -162,21 +163,23 @@
                                 <div>
                                     <RadzenTabs>
                                         <Tabs>
-                                            <RadzenTabsItem Text="Szczegóły">
+                                            <RadzenTabsItem Text="Szczegóły"
+                                                             Visible="GridVisible">
                                                 <RadzenGrid Data="@machine.QualityDetails"
                                                             AllowFiltering="true"
                                                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                                             AllowSorting="true"
                                                             AllowPaging="true"
                                                             TItem="QualityDetailAndMachine"
-                                                            Style="width:1000px;height:540px">
+                                                            Style="width:1200px;height:540px"
+                                                           >
                                                     <Columns>
-                                                        <RadzenGridColumn Filterable="false" TItem="QualityDetailAndMachine" Property="SN" Title="Nr urzadzenia"></RadzenGridColumn>
-                                                        <RadzenGridColumn TItem="QualityDetailAndMachine" Property="FaceValue" Title="Wrt. nominału"></RadzenGridColumn>
-                                                        <RadzenGridColumn TItem="QualityDetailAndMachine" Property="Count" Title="Ilość wystąpień" FormatString="{0:###  ###  ###  ###}"></RadzenGridColumn>
-                                                        <RadzenGridColumn TItem="QualityDetailAndMachine" Property="QualityValue" Title="Jakość"></RadzenGridColumn>
-                                                        <RadzenGridColumn TItem="QualityDetailAndMachine" Property="Symbol" Title="Waluta"></RadzenGridColumn>
-                                                        <RadzenGridColumn TItem="QualityDetailAndMachine" Property="ModeValue" Title="Tryb"></RadzenGridColumn>
+                                                        <RadzenGridColumn Width="200px" Filterable="false" TItem="QualityDetailAndMachine" Property="SN" Title="Nr urzadzenia"></RadzenGridColumn>
+                                                        <RadzenGridColumn Width="200px" TItem="QualityDetailAndMachine" Property="FaceValue" Title="Wrt. nominału"></RadzenGridColumn>
+                                                        <RadzenGridColumn Width="200px" TItem="QualityDetailAndMachine" Property="Count" Title="Ilość wystąpień" FormatString="{0:###  ###  ###  ###}"></RadzenGridColumn>
+                                                        <RadzenGridColumn Width="200px" TItem="QualityDetailAndMachine" Property="QualityValue" Title="Jakość"></RadzenGridColumn>
+                                                        <RadzenGridColumn Width="200px" TItem="QualityDetailAndMachine" Property="Symbol" Title="Waluta"></RadzenGridColumn>
+                                                        <RadzenGridColumn Width="200px" TItem="QualityDetailAndMachine" Property="ModeValue" Title="Tryb"></RadzenGridColumn>
                                                     </Columns>
                                                 </RadzenGrid>
                                             </RadzenTabsItem>
@@ -207,14 +210,18 @@
             List<QualityDetailAndMachine> QualityMachinesList { get; set; }
             //master view
             private IEnumerable<Machine> MachinesCollection;
-
+            public bool GridVisible { get; set; } = false;
 
 
             private bool IsSearchExecuted { get; set; } = false;
 
             private bool AfterExecuted { get; set; } = false;
 
-
+            private void Selected(bool flag)
+            {
+                GridVisible = flag;
+               
+            }
 
             //property converts datetime to begining day and end day
             private DateTime FromDate { get { return new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 00, 00, 00); } }
@@ -288,6 +295,7 @@
 
                 try
                 {
+                    Selected(false);
                     IsSearchExecuted = true;
                     QualityMachinesList = await reportService.GetAllAsync($"qualitiesextreport/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
                     MachinesCollection = await Task.Run(() => MachineList());
