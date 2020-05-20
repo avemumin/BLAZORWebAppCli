@@ -7,7 +7,7 @@
 @inject IReportSerivce<Machine> machineService
 
 @implements IDisposable
-<AuthorizeView Roles="Administrator,RegularUser" Policy="ActiveUser">
+<AuthorizeView Roles="Administrator,Pracownik" Policy="ActiveUser">
     <Authorized>
         @if (displayFilters == true)
         {

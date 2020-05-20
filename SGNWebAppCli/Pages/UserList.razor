@@ -13,29 +13,26 @@
             <h3><b>Lista użytkowników</b></h3>
             <hr />
 
-            <ServerValidation IsVisible="IsVisible" Results="Result">
-                @RecordName
+            <ServerValidation IsVisible="IsVisible"
+                              Results="Result">
+                @RecordInformation
             </ServerValidation>
 
             <EditForm Model="@user" OnValidSubmit="@SaveUser">
-                @*<DataAnnotationsValidator />*@
-                @*@ref="firstNameTextBox"*@
+
                 <div class="col-12 row">
                     <label class="col-2 font-weight-bold">imię :</label>
                     <input type="text" readonly class="form-control col-3" @bind="user.UserName" placeholder="imię" />
-                    @*&nbsp;<ValidationMessage For="@(() => user.UserName)" />*@
                 </div>
                 <br />
                 <div class="col-12 row">
                     <label class="col-2 font-weight-bold">nazwisko :</label>
                     <input type="text" readonly class="form-control col-3" @bind="user.UserLastName" placeholder="nazwisko" />
-                    @*&nbsp;<ValidationMessage For="@(() => user.UserLastName)" />*@
                 </div>
                 <br />
                 <div class="col-12 row">
                     <label class="col-2 font-weight-bold">email  :</label>
                     <input type="text" readonly class="form-control col-3" @bind="user.UserEmailAddress" placeholder="email" />
-                    @*&nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />*@
                 </div>
                 <br />
                 <AuthorizeView Roles="Owner,Administrator">
@@ -49,12 +46,10 @@
                             <span class="col-2"></span>
                             <input type="submit" class="form-control col-1 btn btn-primary" value="Zapisz" />
                             <span>&nbsp;</span>
-                            @*<input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />*@
                         </div>
 
                     </Authorized>
                 </AuthorizeView>
-
             </EditForm>
 
         </div>
@@ -99,7 +94,7 @@
                                                 </NavLink>
                                             </Authorized>
                                         </AuthorizeView>
-                                        <AuthorizeView Roles="NewUser,RegularUser">
+                                        <AuthorizeView Roles="NewUser,Pracownik">
                                             <Authorized>
                                                 <a>@user.UserEmailAddress</a>
                                             </Authorized>
@@ -121,8 +116,17 @@
                                         <AuthorizeView Roles="Owner">
                                             <Authorized>
                                                 <a>|</a>
+                                                @if (ShowDeleteQuestion)
+                                                {
+                                                    <div class="popconfirm">
+                                                        @Message
+                                                        <br />
+                                                        <button type="button" class="btn btn-warning" @onclick="() => Confirmation(false,UserToDelete)">NIE</button>
+                                                        <button type="button" class="btn btn-primary" @onclick="() => Confirmation(true,UserToDelete)">TAK</button>
+                                                    </div>
+                                                }
                                                 <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                                                   @onclick="(() => DeleteUser(user.IdUser))">
+                                                   @onclick="(()=>DeleteAsk(user.IdUser))">
                                                     Usuń
                                                 </a>
                                             </Authorized>
@@ -144,7 +148,7 @@
                                                 </NavLink>
                                             </Authorized>
                                         </AuthorizeView>
-                                        <AuthorizeView Roles="NewUser,RegularUser">
+                                        <AuthorizeView Roles="NewUser,Pracownik">
                                             <Authorized>
                                                 <a>@user.UserEmailAddress</a>
                                             </Authorized>
@@ -166,8 +170,17 @@
                                         <AuthorizeView Roles="Owner">
                                             <Authorized>
                                                 <a>|</a>
+                                                @if (ShowDeleteQuestion)
+                                                {
+                                                    <div class="popconfirm">
+                                                        @Message
+                                                        <br />
+                                                        <button type="button" class="btn btn-warning" @onclick="() => Confirmation(false,UserToDelete)">NIE</button>
+                                                        <button type="button" class="btn btn-primary" @onclick="() => Confirmation(true,UserToDelete)">TAK</button>
+                                                    </div>
+                                                }
                                                 <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
-                                                   @onclick="(()=>DeleteUser(user.IdUser))">
+                                                   @onclick="(()=>DeleteAsk(user.IdUser))">
                                                     Usuń
                                                 </a>
                                             </Authorized>
@@ -193,11 +206,18 @@
     //  ElementReference firstNameTextBox;
 
     public bool IsGridViewFiltered { get; set; }
-    public string RecordName { get; set; }
+
+    public string RecordInformation { get; set; }
+
+    ///Maintenance ServerValidation template
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
 
-    public bool DeleteQuestion { get; set; }
+
+    public bool ShowDeleteQuestion { get; set; }
+    public string Message { set; get; }
+
+    public int UserToDelete { get; set; } = 0;
 
     protected override void OnInitialized()
     {
@@ -272,45 +292,60 @@
         user = argUser;
     }
 
-
-    private async Task DeleteUser(int authorId)
+    private async Task Confirmation(bool value, int id)
     {
-        var selectedUser = await reportSerivce.GetByIdAsync("users/GetUser/",authorId);
-        if(selectedUser !=null && DeleteQuestion)
+        ShowDeleteQuestion = false;
+        if (!value)
+            UserToDelete = 0;
+        else
+            await DeleteUser(UserToDelete);
+    }
+
+    private async Task DeleteAsk(int userId)
+    {
+        var selectedUser = await reportSerivce.GetByIdAsync("users/GetUser/", userId);
+        if (selectedUser != null)
         {
-
+            Message = $"Usunąć  {selectedUser.UserEmailAddress} ?";
+            ShowDeleteQuestion = true;
+            UserToDelete = userId;
         }
-
-        await reportSerivce.DeleteAsync("users/DeleteUser/", authorId);
-        await LoadUsers();
-        Result = true;
-        IsVisible = true;
-
+    }
+    private async Task DeleteUser(int userId)
+    {
+        var selectedUser = await reportSerivce.GetByIdAsync("users/GetUser/", userId);
+        if (selectedUser != null)
+        {
+            await reportSerivce.DeleteAsync("users/DeleteUser/", userId);
+            await LoadUsers();
+            Result = true;
+            IsVisible = true;
+            RecordInformation = $"Usunięto konto {selectedUser.UserName} {selectedUser.UserLastName} - {selectedUser.UserEmailAddress}";
+        }
+        UserToDelete = 0;
     }
     public void Dispose()
     {
         Console.WriteLine("Users - Dispose");
     }
+
     private async Task SaveUser()
     {
-
-        if (user.IdUser == 0)
-            await reportSerivce.SaveAsync("users/CreateUser/", user);
-        else
+        //Mybie sometime some one will to add another user (controller side is ready this part need to uncomment)
+        //if (user.IdUser == 0)
+        //    await reportSerivce.SaveAsync("users/CreateUser/", user);
+        //else
+        if (!string.IsNullOrEmpty(user.UserEmailAddress))
+        {
             await reportSerivce.UpdateAsync("users/UpdateUser/", user.IdUser, user);
+            await LoadUsers();
+            Result = true;
+            IsVisible = true;
+            var firstName = user.UserName;
+            var lastName = user.UserLastName;
 
-        await LoadUsers();
-
-        Result = true;
-        IsVisible = true;
-
-        var firstName = user.UserName;
-        var lastName = user.UserLastName;
-
-        RecordName = firstName + " " + lastName;
-
-        // await JSRuntime.InvokeVoidAsync("saveMessage", firstName, lastName);
-        // await JSRuntime.InvokeVoidAsync("setFocusOnElement", firstNameTextBox);
+            RecordInformation = user.IsActive ? $"Aktywowano konto użytkownika {firstName} {lastName}  " : $"Wyłączono konto użytkownika {firstName} {lastName}";
+        }
 
         user = new User();
 

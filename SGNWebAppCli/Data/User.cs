@@ -9,11 +9,11 @@ namespace SGNWebAppCli.Data
     {
         public int IdUser { get; set; }
 
-        [Required (ErrorMessage = "Imię jest wymagane")]
+        [Required (ErrorMessage = "Uzupełnij imię")]
         [MaxLength(128,ErrorMessage ="Imię jest za długie")]
         public string UserName { get; set; }
 
-        [Required(ErrorMessage = "Nazwisko jest wymagane")]
+        [Required(ErrorMessage = "Uzupełnij nazwisko")]
         [MaxLength(128, ErrorMessage = "Nazwisko jest za długie")]
         public string UserLastName { get; set; }
 
@@ -21,6 +21,7 @@ namespace SGNWebAppCli.Data
 
         [Required (ErrorMessage ="Podaj email")]
         [DataType(DataType.EmailAddress)]
+        [Compare("ConfirmEmailAddress", ErrorMessage = "Emaile nie są takie same")]
         [RegularExpression(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", ErrorMessage = "To nie jest poprawny email")]
         public string UserEmailAddress { get; set; }
 
@@ -38,13 +39,14 @@ namespace SGNWebAppCli.Data
         [Required(ErrorMessage = "Hasło jest wymagane!!")]
         [MaxLength(20)]
         [DataType(DataType.Password)]
+        [Compare("ConfirmPassword", ErrorMessage = "Hasła nie są takie same")]
         [NotMapped]
         [RegularExpression(@"^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!*@#$%^&+=]).*$", ErrorMessage ="Hasło nie spełnia wymagań")]
         public string UserPassword { get; set; }
 
 
 
-        //[Required(ErrorMessage = "Pole wymagane!!")]
+        [Required(ErrorMessage = "Pole wymagane!!")]
         [Compare("UserPassword",ErrorMessage ="Hasła nie są takie same")]
         [DataType(DataType.Password)]
         [NotMapped]

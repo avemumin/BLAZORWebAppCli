@@ -3,69 +3,94 @@
 @page "/user"
 @using SGNWebAppCli.Data
 @using SGNWebAppCli.Services
+@using System.Net.Mail
 @inject IReportSerivce<User> userService
 @inject IReportSerivce<Role> roleService
+@inject IOptions<AppSettings> settings
 @inject NavigationManager GoToPage
 
-    <AuthorizeView Roles="Owner,Administrator">
-        <Authorized Context="another">
-            <EditForm Model="@UserDetails">
-                <div class="col-12 row">
-                    <label class="col-2 font-weight-bold">imię :</label>
-                    <input type="text" class="form-control col-3" @bind="UserDetails.UserName" />
+<AuthorizeView Roles="Owner,Administrator">
+    <Authorized Context="another">
+        <EditForm Model="@UserDetails">
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">imię :</label>
+                <input type="text" class="form-control col-3" @bind="UserDetails.UserName" />
 
-                </div>
-                <br />
-                <div class="col-12 row">
-                    <label class="col-2 font-weight-bold">nazwisko :</label>
-                    <input type="text" class="form-control col-3" @bind="UserDetails.UserLastName" />
+            </div>
+            <br />
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">nazwisko :</label>
+                <input type="text" class="form-control col-3" @bind="UserDetails.UserLastName" />
 
-                </div>
-                <br />
-                <div class="col-12 row">
-                    <label class="col-2 font-weight-bold">email  :</label>
-                    <input type="text" class="form-control col-3" @bind="UserDetails.UserEmailAddress" readonly />
-                    @*&nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />*@
-                </div>
-                <br />
-                <div class="col-12 row">
-                    <label class="col-2 font-weight-bold">obecna rola  :</label>
-                    <input type="text" class="form-control col-3" @bind="RolesDetails.RoleDescription" readonly />
+            </div>
+            <br />
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">email  :</label>
+                <input type="text" class="form-control col-3" @bind="UserDetails.UserEmailAddress" readonly />
+                @*&nbsp;<ValidationMessage For="@(() => user.UserEmailAddress)" />*@
+            </div>
+            <br />
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">obecna rola  :</label>
+                <input type="text" class="form-control col-3" @bind="RolesDetails.RoleDescription" readonly />
 
-                </div>
-                <br />
-                <div class="col-12 row">
-                    <label class="col-2 font-weight-bold">nowa rola  :</label>
-                    <RadzenDropDown AllowClear="false"
-                                    TValue="string"
-                                    Data="@dictionaryRolesId"
-                                    TextProperty="RoleDescription"
-                                    ValueProperty="RoleId"
-                                    Change="@(args=> Change(args,"DropDown"))" />
+            </div>
+            <br />
+            <div class="col-12 row">
+                <label class="col-2 font-weight-bold">nowa rola  :</label>
+                <RadzenDropDown AllowClear="false"
+                                TValue="string"
+                                Data="@dictionaryRolesId"
+                                TextProperty="RoleDescription"
+                                ValueProperty="RoleId"
+                                Change="@(args => Change(args, "DropDown"))" />
 
-                </div>
-                <br />
-                <div>
-                    <a>
-                        <button class="form-control col-1 btn btn-primary" @onclick="(() => Save(UserDetails))">Zapisz</button>
-                    </a>
+            </div>
+            <br />
+            <div style="align-content:flex-end">
+                <a>
+                    <input type="button" class="form-control col-1 btn btn-primary" @onclick="(() => Save(UserDetails))" value="Zapisz">
+                </a>
 
-                    <a>
-                        <button class="form-control col-1 btn btn-secondary" @onclick="(() => BackTo())">Wróć</button>
-                    </a>
-                </div>
-            </EditForm>
-        </Authorized>
-        <NotAuthorized>
-            <AccessDeniedInfo></AccessDeniedInfo>
-        </NotAuthorized>
-    </AuthorizeView>
+                <a>
+                    <input type="button" class="form-control col-1 btn btn-secondary" @onclick="(() => BackTo())" value="Wróć">
+                </a>
+            </div>
+        </EditForm>
+        <span style="font-weight:bold; font-size:26px;color:#ff0000">@Message</span>
+    </Authorized>
+    <NotAuthorized>
+        <AccessDeniedInfo></AccessDeniedInfo>
+    </NotAuthorized>
+</AuthorizeView>
 @code {
     [Parameter]
     public int userid { get; set; }
 
-    public User UserDetails { get; set; }// = new User();
-    public Role RolesDetails { get; set; }// = new Role();
+    private string Message { get; set; } = "";
+    private string Password
+    {
+        get { return settings.Value.password; }
+    }
+    private string FromEmail
+    {
+        get { return settings.Value.from; }
+    }
+    private int Port
+    {
+        get { return settings.Value.port; }
+    }
+    private string SMTP
+    {
+        get { return settings.Value.smtp; }
+    }
+    private bool NeedSend
+    {
+        get { return settings.Value.needmail; }
+    }
+
+    public User UserDetails { get; set; }
+    public Role RolesDetails { get; set; }
 
     private byte RolesPropertyKey { get; set; }
     private IEnumerable<Role> dictionaryRoles { get; set; }
@@ -86,19 +111,20 @@
 
     }
 
-    //private string Descriptor(byte id)
-    //{
-    //    return dictionaryRoles.Where(x => x.RoleId == id).Select(x => x.RoleDescription).FirstOrDefault();
-    //}
-
     private async Task Save(User someUser)
     {
         if (someUser != null)
         {
-            someUser.RoleId = RolesPropertyKey;
-            UserDetails = await userService.UpdateAsync("users/UpdateUser/", someUser.IdUser, someUser);
-            UserDetails = new User();
-            GoToPage.NavigateTo("/userlist");
+            if (!RolesPropertyKey.Equals(0))
+                someUser.RoleId = RolesPropertyKey;
+            await userService.UpdateAsync("users/UpdateUser/", someUser.IdUser, someUser);
+            UserDetails = await userService.GetByIdAsync("users/GetUser/", userid);
+            Message = "Wysyłam wiadonmość";
+            StateHasChanged();
+            if (NeedSend)
+                await SendMail(UserDetails);
+            //  UserDetails = new User();
+            // GoToPage.NavigateTo("/userlist");
         }
     }
     private void BackTo()
@@ -115,5 +141,48 @@
         events.Add(DateTime.Now, $"{name} value changed to {str}");
         RolesPropertyKey = dictionaryRoles.Where(x => x.RoleDescription.Equals(str)).Select(x => x.RoleId).FirstOrDefault();
         StateHasChanged();
+    }
+
+
+
+
+    private async Task SendMail(User user )
+    {
+        try
+        {
+
+            await Task.Delay(500);
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(FromEmail);
+                mail.To.Add(user.UserEmailAddress);
+                mail.Subject = $"Modyfikacja uprawnień konta";
+                mail.Body = $"<p> Witaj, </p>" +
+                            $"<p> {user.UserName } {user.UserLastName}</p>" +
+                            $"<p> Twoje konto zostało aktywowane dnia {DateTime.Now} </p>" +
+                            $"<h5>Wiadomość została wysłana automatycznie proszę na nią nie odpowiadać</h5>";
+                mail.IsBodyHtml = true;
+
+                //wylaczenie poswiadczen dla goole
+                //https://myaccount.google.com/lesssecureapps?pli=1
+                //https://docs.microsoft.com/pl-pl/dotnet/api/system.net.mail.smtpclient?view=netcore-3.1
+                //http://www.mimekit.net/docs/html/M_MailKit_Net_Smtp_SmtpClient_ConnectAsync_1.htm nowszy sprzet do slania maili
+                using (SmtpClient smtp = new SmtpClient(SMTP, Port))
+                {
+                    smtp.Credentials = new System.Net.NetworkCredential(FromEmail, Password);
+                    smtp.EnableSsl = true;
+                    //adres serwera SMTP 10.59.10.106 port 25 G0l@bp0cztowY2020
+                    smtp.Send(mail);
+                    Message = $"Wiadomość do {UserDetails.UserEmailAddress} została wysłana";
+                    StateHasChanged();
+                }
+                mail.Dispose();
+            }
+        }
+        catch (Exception ex)
+        {
+
+            Message = ex.Message;
+        }
     }
 }
