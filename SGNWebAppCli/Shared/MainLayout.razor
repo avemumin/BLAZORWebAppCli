@@ -8,7 +8,7 @@
     <div class="top-row px-4">
         <AuthorizeView>
             <Authorized>
-                <a style="color:forestgreen;font-style:oblique"> @context.User.Identity.Name </a>
+                <a style="color:forestgreen;font-style:oblique">Witaj, @context.User.Identity.Name </a>
                 <a href="/" @onclick="@(() => Logout())">Wyloguj</a>
             </Authorized>
             <NotAuthorized>
