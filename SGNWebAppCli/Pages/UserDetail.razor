@@ -123,10 +123,7 @@
             if (NeedSend)
             {
                 Message = "Wysyłam wiadomość";
-                if (true)
-                {
-                    await SendMailMsOldLibrary(UserDetails);
-                }
+                await SendMailMsOldLibrary(UserDetails);
             }
             await OnInitializedAsync();
         }
