@@ -4,6 +4,7 @@
 @inject IReportSerivce<Currency> dictionaryCurrencyService
 @inject IReportSerivce<Mode> dictionaryModeService
 @inject IReportSerivce<Quality> dictionaryQualityService
+@inject IModalService modalService
 
 @implements IDisposable
 <AuthorizeView Roles="Administrator,Pracownik" Policy="ActiveUser">
@@ -68,10 +69,30 @@
                     </div>
                     <div>
                         <br />
-                        <div>
-                            <RadzenButton Click="executeSearching" Text="Wyszukaj"></RadzenButton>
+                        <div style="align-content:center">
+                            <RadzenButton Click="executeSearching" Text="Wyszukaj" Style="width:150px"></RadzenButton>
                         </div>
 
+                    </div>
+                </div>
+                <div style="width:15px;height: auto;margin-left:5px">
+
+                </div>
+                <div style="width:150px;height:auto;margin-left:5px">
+                    <div>
+                        <br />
+                        <p></p>
+                        @if (QualityList.Count > 0)
+                        {
+                            <RadzenButton Style="background-color:cornflowerblue;width:170px;text-align:center" Click="summary" Text="Podsumowanie" />
+                        }
+                    </div>
+                    <div>
+                        <br />
+                        @if (QualityList.Count > 0)
+                        {
+                            <RadzenButton Style="background-color:indianred;width:170px;text-align:center" Click="summary" Text="Zapisz" />
+                        }
                     </div>
                 </div>
             </div>
@@ -140,6 +161,7 @@
     private List<QualityDetail> QualityList { get; set; }
     private bool AfterExecuted { get; set; } = false;
 
+    private List<Currency> summaryCurrencydictionary { get; set; }
 
 
     //property converts datetime to begining day and end day
@@ -177,10 +199,13 @@
     {
         try
         {
+            summaryCurrencydictionary = new List<Currency>();
             QualityList = new List<QualityDetail>();
             dictionaryCurrencies = await dictionaryCurrencyService.GetAllAsync("Currencies/");
             dictionaryQualities = await dictionaryQualityService.GetAllAsync("Qualities/");
             dictionaryModes = await dictionaryModeService.GetAllAsync("Modes/");
+            if (dictionaryCurrencies != null)
+                summaryCurrencydictionary = dictionaryCurrencies as List<Currency>;
 
             dictionaryCurrenciesId = dictionaryCurrencies.Select(x => x.IdCurrency);
             dictionaryQualitiesId = dictionaryQualities.Select(x => x.IdQuality);
@@ -221,7 +246,7 @@
         {
 
             IsSearchExecuted = true;
-          //  await Task.Delay(2000);
+            //  await Task.Delay(2000);
             QualityList = await reportService.GetAllAsync($"qualitiesreport/{QualityPropertyKey}/{CurrencyPropertyKey}/{ModePropertyKey}/{FromDate.ToString("yyyy-MM-dd HH:mm:ss")}/{ToDate.ToString("yyyy-MM-dd HH:mm:ss")}");
             IsSearchExecuted = false;
             AfterExecuted = true;
@@ -296,6 +321,59 @@
         QualityPropertyKey = strqd.ToString();
 
         StateHasChanged();
+    }
+
+    private List<TotalFaceSummary> OrderQuality(List<QualityDetail> qualityDetails)
+    {
+        var componentCollection = new List<TotalFaceSummary>();
+        var result = from currency in qualityDetails
+                     group currency by new
+                     {
+                         Curr = currency.IdCurrency,
+                         cFaceVal = currency.IdCurrencyFaceValue,
+                         Face = currency.FaceValue
+                     } into currencyGroup
+                     join dict in summaryCurrencydictionary on currencyGroup.Key.Curr equals dict.IdCurrency
+                     orderby dict.IdCurrency, currencyGroup.Key.Face
+                     select new
+                     {
+                         nominal = currencyGroup.Key.Face,
+                         idwaluta = currencyGroup.Key.Curr,
+                         ilosc = currencyGroup.Sum(x => x.Count),
+                         symbol = dict.Symbol,
+                         idnominal = currencyGroup.Key.cFaceVal
+                     };
+        try
+        {
+            if (result != null)
+            {
+                foreach (var item in result)
+                {
+                    componentCollection.Add(new TotalFaceSummary
+                    {
+                        IdCurrency = item.idwaluta,
+                        FaceValue = item.nominal,
+                        Symbol = item.symbol,
+                        Count = item.ilosc,
+                        IdCurrencyFaceValue = item.idnominal
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message.ToString());
+        }
+        return componentCollection;
+    }
+
+    async Task summary()
+    {
+      //  await Task.Delay(1000);
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(SummaryQualityComponent.ComponentCollection), OrderQuality(QualityList));
+        var doIt = modalService.Show<SummaryQualityComponent>("Podsumowanie", parameters);
+        await doIt.Result;
     }
     #endregion
 

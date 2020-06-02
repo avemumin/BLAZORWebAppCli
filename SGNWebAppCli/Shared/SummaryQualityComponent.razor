@@ -1,0 +1,50 @@
+﻿@using SGNWebAppCli.Data
+@if (ComponentCollection != null)
+{
+    if (ComponentCollection.Count > 0)
+    {
+        <div style="width:500px">
+            <br />
+            <RadzenGrid AllowFiltering="false" 
+                        AllowPaging="true"
+                        PageSize="6"
+                        AllowSorting="true" 
+                        Data="@ComponentCollection" 
+                        TItem="TotalFaceSummary" 
+                        ColumnWidth="150px">
+                <Columns>
+                    <RadzenGridColumn TItem="TotalFaceSummary"
+                                      Property="FaceValue"
+                                      Title="Nominał"
+                                      TextAlign="TextAlign.Center" />
+                    <RadzenGridColumn TItem="TotalFaceSummary" 
+                                      Property="Count" 
+                                      Title="Ilość" TextAlign="TextAlign.Center" 
+                                      FormatString="{0:###  ###  ###  ###}" />
+                    <RadzenGridColumn TItem="TotalFaceSummary" 
+                                      Property="Symbol" 
+                                      Title="Waluta" 
+                                      TextAlign="TextAlign.Right" />
+                </Columns>
+            </RadzenGrid>
+        </div>
+    }
+    else
+    {
+        Message = "Lista jest pusta";
+    }
+}
+else
+{
+    Message = "";
+}
+
+
+@code {
+    [Parameter] public List<TotalFaceSummary> ComponentCollection { get; set; }
+    [Parameter] public string Message { get; set; }
+    [CascadingParameter] BlazoredModalInstance _modalNugetComponent { get; set; }
+    void Confirm() => _modalNugetComponent.Close();
+    void Cancel() => _modalNugetComponent.Cancel();
+
+}

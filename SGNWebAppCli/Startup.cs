@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Blazored.Modal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -35,7 +36,7 @@ namespace SGNWebAppCli
             services.AddTransient<ValidateHeaderHandler>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddBlazoredLocalStorage();
-
+            services.AddBlazoredModal();
             services.AddHttpClient<IUserService, UserService>();
 
             services.AddHttpClient<IReportSerivce<Currency>, ReportService<Currency>>();

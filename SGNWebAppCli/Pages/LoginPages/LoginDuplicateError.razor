@@ -1,0 +1,27 @@
+﻿@page  "/loginDuplicate"
+@inject NavigationManager GoToPage
+@implements IDisposable
+<div>
+    <div>
+        <p class="alert alert-warning" style="font-size:40px">
+            Błąd rejestracji
+            <br />
+            wybrany login istnieje w bazie.
+            <br/>
+            Skontaktuj się z administratorem
+        </p>
+        <br />
+        <input type="submit" class="form-control col-6 btn btn-primary" @onclick="@GoToLoginPage" value="Rozumiem" />
+    </div>
+</div>
+
+@code {
+    private void GoToLoginPage()
+    {
+        GoToPage.NavigateTo("/");
+    }
+    public void Dispose()
+    {
+        Console.WriteLine("Info after registration - Dispose");
+    }
+}

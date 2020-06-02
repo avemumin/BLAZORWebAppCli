@@ -89,6 +89,7 @@
         get { return settings.Value.needmail; }
     }
 
+
     public User UserDetails { get; set; }
     public Role RolesDetails { get; set; }
 
@@ -119,12 +120,15 @@
                 someUser.RoleId = RolesPropertyKey;
             await userService.UpdateAsync("users/UpdateUser/", someUser.IdUser, someUser);
             UserDetails = await userService.GetByIdAsync("users/GetUser/", userid);
-            Message = "Wysyłam wiadonmość";
-            StateHasChanged();
             if (NeedSend)
-                await SendMail(UserDetails);
-            //  UserDetails = new User();
-            // GoToPage.NavigateTo("/userlist");
+            {
+                Message = "Wysyłam wiadomość";
+                if (true)
+                {
+                    await SendMailMsOldLibrary(UserDetails);
+                }
+            }
+            await OnInitializedAsync();
         }
     }
     private void BackTo()
@@ -146,7 +150,7 @@
 
 
 
-    private async Task SendMail(User user )
+    private async Task SendMailMsOldLibrary(User user)
     {
         try
         {
@@ -169,6 +173,7 @@
                 //http://www.mimekit.net/docs/html/M_MailKit_Net_Smtp_SmtpClient_ConnectAsync_1.htm nowszy sprzet do slania maili
                 using (SmtpClient smtp = new SmtpClient(SMTP, Port))
                 {
+                    smtp.UseDefaultCredentials = false;
                     smtp.Credentials = new System.Net.NetworkCredential(FromEmail, Password);
                     smtp.EnableSsl = true;
                     //adres serwera SMTP 10.59.10.106 port 25 G0l@bp0cztowY2020

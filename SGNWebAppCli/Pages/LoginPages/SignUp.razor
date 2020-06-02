@@ -81,6 +81,7 @@
     }
     private async Task<bool> RegisterUser()
     {
+
         displaySummary = "display:block";
         user = _userEditCntx;
         user.IsActive = false;
@@ -93,6 +94,12 @@
         {
             ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
             NavigationManager.NavigateTo("/afterCreateAccountInformation");
+        }
+        else
+        {
+
+            NavigationManager.NavigateTo("/loginDuplicate");
+            return await Task.FromResult(false);
         }
         return await Task.FromResult(true);
     }
