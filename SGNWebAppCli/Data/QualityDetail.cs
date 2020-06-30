@@ -7,7 +7,7 @@
         //nominal
         public decimal FaceValue { get; set; }
         public long CountedCount { get; set; }
-        //ilosc
+        //ilosc 
         public long Count { get; set; }
         public string QualityValue { get; set; }
         public string Symbol { get; set; }
